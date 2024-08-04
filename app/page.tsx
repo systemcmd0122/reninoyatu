@@ -19,9 +19,8 @@ export default function Home() {
             <Link href="/contact" className="nav-link">Contact</Link>
           </div>
         </nav>
-        <div className='test '>
-        現在、例のやつ様のホームページ兼ブログのようなものを作成しております。<br />
-        ９月ごろまでに最終的なアップデートを完了させる予定です。たくさんの方にご利用していただくため様々な機能を追加していきます。
+        <div>
+
         </div>
       </div>
     </main>

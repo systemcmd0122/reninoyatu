@@ -110,19 +110,3 @@
     animation: slide-down 1s ease-in-out;
   }
 }
-
-/* お知らせ　削除予定*/
-.test {
-  background-color: rgba(255, 255, 255, 0.9); /* 半透明の背景色 */
-  border: 2px solid #444; /* ボーダーの色 */
-  border-radius: 8px; /* 角を丸める */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 軽いシャドウを追加 */
-  padding: 1.5rem; /* 内側の余白 */
-  margin: 1rem; /* 外側の余白 */
-  max-width: 600px; /* 最大幅を指定 */
-  text-align: center; /* テキストを中央揃え */
-  font-size: 1.125rem; /* フォントサイズ */
-  line-height: 1.5; /* 行の高さ */
-  color: #333; /* テキストカラー */
-}
-
