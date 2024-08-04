@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* フォント */
+.minecraft-font {
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* 背景画像 */
+.background-image {
+  background-image: url('/back.png');
+  background-size: cover; /* 背景画像が要素全体を覆うようにする */
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  transition: opacity 1s ease;
+}
+
+/* メインコンテンツ */
+.main-content {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2rem;
+  min-height: calc(100vh - 4rem); /* ナビゲーションバーの高さを引いた値 */
+}
+
+/* ナビゲーションバー */
+.navbar {
+  background-color: rgba(0, 0, 0, 0.8);
+  border-bottom: 2px solid #444;
+}
+
+/* ナビゲーションバー内リンク */
+.nav-link {
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid #666;
+  box-shadow: 2px 2px 0 #333;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ボタンにゲーミング風の光エフェクトを追加 */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+
+/* ボタンの内容 */
+.nav-link span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ホバー時のゲーミング光エフェクト */
+.nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.6), 0 0 35px rgba(0, 255, 255, 0.4);
+}
+
+.nav-link:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* 押されたときのアニメーション */
+.nav-link:active {
+  background-color: rgba(0, 0, 0, 0.9);
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+  transform: scale(0.98);
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+/* 上から滑らかにスライドダウンする */
+@layer utilities {
+  @keyframes slide-down {
+    from {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .slide-down {
+    animation: slide-down 1s ease-in-out;
+  }
+}
+
+/* お知らせ　削除予定*/
+.test {
+  background-color: rgba(255, 255, 255, 0.9); /* 半透明の背景色 */
+  border: 2px solid #444; /* ボーダーの色 */
+  border-radius: 8px; /* 角を丸める */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 軽いシャドウを追加 */
+  padding: 1.5rem; /* 内側の余白 */
+  margin: 1rem; /* 外側の余白 */
+  max-width: 600px; /* 最大幅を指定 */
+  text-align: center; /* テキストを中央揃え */
+  font-size: 1.125rem; /* フォントサイズ */
+  line-height: 1.5; /* 行の高さ */
+  color: #333; /* テキストカラー */
+}
+
