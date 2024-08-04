@@ -19,9 +19,6 @@ export default function Home() {
             <Link href="/contact" className="nav-link">Contact</Link>
           </div>
         </nav>
-        <div>
-
-        </div>
       </div>
     </main>
   );
