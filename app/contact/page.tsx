@@ -17,6 +17,7 @@ const Contact = () => {
             <Link href="/" className="nav-link">Home</Link>
             <Link href="/about" className="nav-link">About</Link>
             <Link href="/contact" className="nav-link">Contact</Link>
+            <Link href="/enjoy" className='nav-link'>Enjoy</Link>
           </div>
         </nav>
         <main className="flex-grow flex items-center justify-center">
