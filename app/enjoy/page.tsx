@@ -23,7 +23,6 @@ const Enjoy = () => {
           </div>
         </nav>
         <main className="flex-grow flex flex-col items-center justify-center">
-          <h1 className="text-2xl font-bold mb-8">開発中</h1>
           <Clicker />
         </main>
       </div>

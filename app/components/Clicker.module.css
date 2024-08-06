@@ -1,3 +1,5 @@
+/* Clicker.module.css */
+
 .container {
   display: flex;
   flex-direction: column;
@@ -6,9 +8,15 @@
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  font-size: 3rem;
+  position: absolute;
+  top: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #FFFFFF; /* 文字色を白に設定 */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 文字に影をつけて立体感を出す */
+  font-family: 'Press Start 2P', cursive; /* おしゃれなフォント */
+  z-index: 999; /* 位置調整のためのz-index設定 */
 }
 
 .buttonWrapper {
@@ -42,11 +50,6 @@
   transition: transform 0.3s ease-in-out;
 }
 
-.icon {
-  width: 100%;
-  height: 100%;
-}
-
 .clicked {
   animation: clickAnimation 0.3s ease-in-out;
 }
@@ -62,4 +65,46 @@
   color: blue;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.popup {
+  position: fixed;
+  top: 35%;
+  left: 55%;
+  transform: translate(-50%, -50%);
+  color: #FFD700;
+  text-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+  z-index: 1000;
+  font-size: 4rem;
+  opacity: 1;
+  transition: opacity 5s ease-out; /* アニメーションの速度を設定 */
+  min-width: 200px; /* 最小幅を設定 */
+  min-height: 200px; /* 最小高さを設定 */
+}
+
+.icon {
+  width: 300%; /* 親要素の幅に合わせる */
+  height: 300%; /* 親要素の高さに合わせる */
+  max-width: 600px; /* 最大幅を指定 */
+  max-height: 600px; /* 最大高さを指定 */
+  position: absolute;
+  top: 50%; /* ビューポートの縦の中央に配置 */
+  left: 50%; /* ビューポートの横の中央に配置 */
+  transform: translate(-50%, -50%); /* 画像の中央を基準に配置 */
+  object-fit: contain; /* アスペクト比を保ちながらリサイズ */
+}
+
+.celebration {
+  position: fixed;
+  top: 10%;
+  left: 70%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: #FFD700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1001;
+  text-align: center;
 }
