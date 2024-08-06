@@ -1,5 +1,3 @@
-/* Clicker.module.css */
-
 .container {
   display: flex;
   flex-direction: column;
@@ -13,10 +11,10 @@
   top: 120px;
   left: 50%;
   transform: translateX(-50%);
-  color: #FFFFFF; /* 文字色を白に設定 */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 文字に影をつけて立体感を出す */
-  font-family: 'Press Start 2P', cursive; /* おしゃれなフォント */
-  z-index: 999; /* 位置調整のためのz-index設定 */
+  color: #FFFFFF;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Press Start 2P', cursive;
+  z-index: 999;
 }
 
 .buttonWrapper {
@@ -54,32 +52,17 @@
   animation: clickAnimation 0.3s ease-in-out;
 }
 
-.error {
-  margin-top: 1rem;
-  color: red;
-}
-
-.dismissButton {
-  background: none;
-  border: none;
-  color: blue;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
 .popup {
   position: fixed;
-  top: 35%;
-  left: 55%;
+  top: 40%;
+  left: 50%;
   transform: translate(-50%, -50%);
   color: #FFD700;
-  text-shadow: 4px 4px 8px rgba(0,0,0,0.5);
+  text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
   z-index: 1000;
   font-size: 4rem;
   opacity: 1;
-  transition: opacity 5s ease-out; /* アニメーションの速度を設定 */
-  min-width: 200px; /* 最小幅を設定 */
-  min-height: 200px; /* 最小高さを設定 */
+  transition: opacity 1s ease-out, transform 1s ease-out;
 }
 
 .icon {
@@ -97,7 +80,7 @@
 .celebration {
   position: fixed;
   top: 10%;
-  left: 70%;
+  left: 50%;
   transform: translate(-50%, -50%);
   font-size: 2rem;
   color: #FFD700;
@@ -107,4 +90,17 @@
   border-radius: 10px;
   z-index: 1001;
   text-align: center;
+}
+
+.error {
+  color: red;
+  margin-top: 20px;
+}
+
+.dismissButton {
+  background: none;
+  border: none;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
 }

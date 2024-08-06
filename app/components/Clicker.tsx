@@ -16,6 +16,7 @@ const Clicker: React.FC = () => {
   const [clickCount, setClickCount] = useState<number>(0);
   const [confettiPieces, setConfettiPieces] = useState<number[]>([]);
   const [celebration, setCelebration] = useState<boolean>(false);
+  const [celebrationCount, setCelebrationCount] = useState<number>(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const countRef = doc(db, 'count', 'Mxhrra483w0h3QlUx8ek');
@@ -45,8 +46,7 @@ const Clicker: React.FC = () => {
 
   const handleIncrement = useCallback(async () => {
     setClickCount((prev) => prev + 1);
-    setConfettiPieces((prev) => [...prev, Date.now()]);
-    
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -58,8 +58,10 @@ const Clicker: React.FC = () => {
       });
 
       if (newCount % 100 === 0) {
+        setCelebrationCount(newCount);
         setCelebration(true);
-        timeoutRef.current = setTimeout(() => setCelebration(false), 5000); // 5秒間お祝いモードを継続
+        setConfettiPieces([Date.now()]); // 100の倍数になったときだけ紙吹雪を表示
+        timeoutRef.current = setTimeout(() => setCelebration(false), 5000);
       }
     } catch (error) {
       console.error('Error updating document:', error);
@@ -80,9 +82,8 @@ const Clicker: React.FC = () => {
 
   return (
     <motion.div className={styles.container}>
-      {confettiPieces.map((id) => (
+      {confettiPieces.length > 0 && (
         <Confetti
-          key={id}
           width={window.innerWidth}
           height={window.innerHeight}
           recycle={false}
@@ -95,7 +96,7 @@ const Clicker: React.FC = () => {
             h: 0
           }}
         />
-      ))}
+      )}
       {celebration && (
         <Confetti
           width={window.innerWidth}
@@ -109,7 +110,7 @@ const Clicker: React.FC = () => {
       <div className={styles.buttonWrapper}>
         <motion.button
           onClick={handleIncrement}
-          className={styles.button}
+          className={`${styles.button} ${clickCount > 0 ? styles.clicked : ''}`}
           disabled={isLoading}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -121,9 +122,9 @@ const Clicker: React.FC = () => {
         {clickCount > 0 && (
           <motion.div
             className={styles.popup}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
+            initial={{ opacity: 0, transform: 'translate(-50%, -50%) scale(0.5)' }}
+            animate={{ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' }}
+            exit={{ opacity: 0, transform: 'translate(-50%, -50%) scale(0.5)' }}
             transition={{ duration: 0.5 }}
             key={clickCount}
           >
@@ -135,12 +136,12 @@ const Clicker: React.FC = () => {
         {celebration && (
           <motion.div
             className={styles.celebration}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1, rotateZ: [0, 10, -10, 0] }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+            initial={{ opacity: 0, transform: 'translate(-50%, -50%) scale(0.5)' }}
+            animate={{ opacity: 1, transform: 'translate(-50%, -50%) scale(1)' }}
+            exit={{ opacity: 0, transform: 'translate(-50%, -50%) scale(0.5)' }}
+            transition={{ duration: 0.5 }}
           >
-            🎉 おめでとう{count}回目のクリックを達成しました! 🎉
+            🎉 おめでとう{celebrationCount}回目のクリックを達成しました! 🎉
           </motion.div>
         )}
       </AnimatePresence>

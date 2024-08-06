@@ -13,7 +13,7 @@
 /* 背景画像 */
 .background-image {
   background-image: url('/back.png');
-  background-size: cover; /* 背景画像が要素全体を覆うようにする */
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   filter: blur(8px);
@@ -31,7 +31,11 @@
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
   padding: 2rem;
-  min-height: calc(100vh - 4rem); /* ナビゲーションバーの高さを引いた値 */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ナビゲーションバー */
@@ -94,20 +98,68 @@
 }
 
 /* 上から滑らかにスライドダウンする */
-@layer utilities {
-  @keyframes slide-down {
-    from {
-      transform: translateY(-100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
   }
-
-  .slide-down {
-    animation: slide-down 1s ease-in-out;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
+.slide-down {
+  animation: slide-down 1s ease-in-out;
+}
+
+/* 自己紹介 */
+.intro-container {
+  display: flex;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.intro-icon {
+  width: 200px;
+  height: 200px;
+  margin-right: 3rem;
+  border-radius: 50%;
+}
+
+.intro-content {
+  text-align: left;
+}
+
+.intro-title {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.intro-content p {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .intro-container {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .intro-icon {
+    margin-right: 0;
+    margin-bottom: 2rem;
+  }
+
+  .intro-title {
+    font-size: 3rem;
+  }
+
+  .intro-content p {
+    font-size: 1.2rem;
+  }
+}
