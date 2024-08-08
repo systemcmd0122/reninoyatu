@@ -156,3 +156,73 @@ body, html {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* 既存のスタイルに追加 */
+
+.chat-message-username {
+  font-size: 0.8em;
+  color: #888;
+  margin-bottom: 2px;
+}
+
+.chat-message-content {
+  position: relative;
+}
+
+.chat-message-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.chat-message-menu button {
+  background: none;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  color: #333;
+}
+
+.chat-message-menu button:hover {
+  background-color: #f0f0f0;
+}
+
+.chat-message-content textarea {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: 14px;
+  resize: vertical;
+}
+
+/* 既存のスタイルに追加 */
+
+.chat-context-menu {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 5px;
+}
+
+.chat-context-menu button {
+  background: none;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  color: #333;
+  width: 100%;
+  text-align: left;
+}
+
+.chat-context-menu button:hover {
+  background-color: #f0f0f0;
+}

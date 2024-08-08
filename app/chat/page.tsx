@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, MouseEvent, KeyboardEvent } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import './styles.css';
@@ -13,6 +13,7 @@ interface ChatData {
   created_at: string;
   username: string;
   avatar_url?: string;
+  isEditing?: boolean;
 }
 
 interface UserData {
@@ -32,8 +33,11 @@ const Chat = () => {
   const [loginState, setLoginState] = useState<'login' | 'register' | 'chat'>('login');
   const [showSettings, setShowSettings] = useState(false);
   const [error, setError] = useState('');
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; messageId: string } | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,28 +95,37 @@ const Chat = () => {
   const handleSendMessage = async () => {
     if (newMessage.trim() === '' || !username) return;
 
-    const { error } = await supabase
-      .from('chat_data')
-      .insert([
-        {
-          id: uuidv4(),
-          content: newMessage,
-          created_at: new Date().toISOString(),
-          username,
-          avatar_url: avatarUrl
-        }
-      ]);
-
-    if (error) {
-      console.error('メッセージの送信中にエラーが発生しました:', error);
+    if (editingMessageId) {
+      await handleEditMessage(editingMessageId, newMessage);
     } else {
-      setNewMessage('');
+      const { error } = await supabase
+        .from('chat_data')
+        .insert([
+          {
+            id: uuidv4(),
+            content: newMessage,
+            created_at: new Date().toISOString(),
+            username,
+            avatar_url: avatarUrl
+          }
+        ]);
+
+      if (error) {
+        console.error('メッセージの送信中にエラーが発生しました:', error);
+      }
     }
+
+    setNewMessage('');
+    setEditingMessageId(null);
+    setContextMenu(null); // 右クリックメニューを消す
   };
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter') {
       event.preventDefault();
+      if (event.shiftKey) {
+        return; // Shift + Enterで改行
+      }
       handleSendMessage();
     }
   };
@@ -230,28 +243,74 @@ const Chat = () => {
     setLoginState('login');
   };
 
-  const handleDeleteMessages = async () => {
-    try {
-      const { error } = await supabase
-        .from('chat_data')
-        .delete()
-        .neq('username', username);
-
-      if (error) {
-        console.error('メッセージの削除中にエラーが発生しました:', error);
-        setError('メッセージの削除中にエラーが発生しました');
-        return;
-      }
-    } catch (error) {
-      console.error('メッセージの削除中にエラーが発生しました:', error);
-      setError('メッセージの削除中にエラーが発生しました');
-    }
-  };
-
   const linkify = (text: string) => {
     const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
   };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    const { error } = await supabase
+      .from('chat_data')
+      .delete()
+      .eq('id', messageId);
+
+    if (error) {
+      console.error('メッセージの削除中にエラーが発生しました:', error);
+    }
+  };
+
+  const handleEditMessage = async (messageId: string | null, newContent: string) => {
+    if (!messageId || !newContent.trim()) return;
+
+    const { error } = await supabase
+      .from('chat_data')
+      .update({ content: newContent })
+      .eq('id', messageId);
+
+    if (error) {
+      console.error('メッセージの編集中にエラーが発生しました:', error);
+    } else {
+      setEditingMessageId(null);
+      setNewMessage('');
+      setContextMenu(null); // 右クリックメニューを消す
+    }
+  };
+
+  const handleContextMenu = (event: MouseEvent, messageId: string) => {
+    event.preventDefault();
+    const message = messages.find(msg => msg.id === messageId);
+    if (message && message.username === username) {
+      setContextMenu({ x: event.clientX, y: event.clientY, messageId });
+    }
+  };
+
+  const handleMenuAction = (action: 'edit' | 'delete') => {
+    if (contextMenu) {
+      if (action === 'delete') {
+        handleDeleteMessage(contextMenu.messageId);
+      } else if (action === 'edit') {
+        const messageToEdit = messages.find(msg => msg.id === contextMenu.messageId);
+        if (messageToEdit) {
+          setEditingMessageId(contextMenu.messageId);
+          setNewMessage(messageToEdit.content);
+        }
+      }
+      setContextMenu(null);
+    }
+  };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (contextMenu && containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      setContextMenu(null);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside as unknown as EventListener);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside as unknown as EventListener);
+    };
+  }, [contextMenu]);
 
   const renderLogin = () => (
     <div className="chat-login-container">
@@ -296,14 +355,14 @@ const Chat = () => {
   );
 
   const renderChat = () => (
-    <div className="chat-container">
+    <div className="chat-container" ref={containerRef}>
       <div className="chat-header">
         <h2>チャット</h2>
         <button className="chat-settings-button" onClick={() => setShowSettings(!showSettings)}>
           ⚙
         </button>
         {showSettings && (
-          <div className="chat-settings-menu">
+          <div className="chat-settings-menu" style={{ zIndex: 1000 }}> {/* z-indexを設定 */}
             <h3>設定</h3>
             <input
               type="text"
@@ -318,13 +377,26 @@ const Chat = () => {
       </div>
       <div className="chat-messages">
         {messages.map((msg) => (
-          <div key={msg.id} className={`chat-message ${msg.username === username ? 'own-message' : ''}`}>
+          <div
+            key={msg.id}
+            className={`chat-message ${msg.username === username ? 'own-message' : ''}`}
+            onContextMenu={(e) => handleContextMenu(e, msg.id)}
+          >
             <img src={msg.avatar_url || DEFAULT_AVATAR} alt="Avatar" className="chat-avatar" />
-            <div className="chat-message-content" dangerouslySetInnerHTML={{ __html: linkify(msg.content) }} />
+            <div className="chat-message-content">
+              <span className="chat-message-username">{msg.username}</span>
+              <div dangerouslySetInnerHTML={{ __html: linkify(msg.content) }} />
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
+      {contextMenu && (
+        <div className="chat-context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
+          <button onClick={() => handleMenuAction('edit')}>編集</button>
+          <button onClick={() => handleMenuAction('delete')}>削除</button>
+        </div>
+      )}
       <div className="chat-input-container">
         <textarea
           className="chat-textarea"
@@ -333,7 +405,9 @@ const Chat = () => {
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button className="chat-button" onClick={handleSendMessage}>送信</button>
+        <button className="chat-button" onClick={handleSendMessage}>
+          {editingMessageId ? '編集' : '送信'}
+        </button>
       </div>
     </div>
   );
@@ -345,6 +419,6 @@ const Chat = () => {
       {loginState === 'chat' && renderChat()}
     </div>
   );
-}
+};
 
 export default Chat;
