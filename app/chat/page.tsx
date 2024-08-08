@@ -41,6 +41,18 @@ export default function Chat() {
   };
 
   useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    const storedAvatarUrl = localStorage.getItem('avatarUrl');
+
+    if (storedUsername) {
+      setUsername(storedUsername);
+      setAvatarUrl(storedAvatarUrl || DEFAULT_AVATAR);
+      setIsChatVisible(true);
+      setLoginState('chat');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isChatVisible) {
       fetchMessages();
 
@@ -50,9 +62,8 @@ export default function Chat() {
           event: '*',
           schema: 'public',
           table: 'chat_data',
-        }, (payload) => {
-          setMessages(prevMessages => [...prevMessages, payload.new as ChatData]);
-          scrollToBottom();
+        }, () => {
+          fetchMessages();  // メッセージを再取得
         })
         .subscribe();
 
@@ -123,6 +134,8 @@ export default function Chat() {
       }
 
       setAvatarUrl(data.avatar_url || DEFAULT_AVATAR);
+      localStorage.setItem('username', username);
+      localStorage.setItem('avatarUrl', data.avatar_url || DEFAULT_AVATAR);
       setIsChatVisible(true);
       setLoginState('chat');
     } catch (error) {
@@ -145,105 +158,87 @@ export default function Chat() {
         .single();
 
       if (data) {
-        setError('そのユーザー名はすでに使用されています');
+        setError('このユーザー名は既に使用されています');
         return;
       }
 
       const { error: insertError } = await supabase
         .from('users')
-        .insert([{
-          username,
-          password: newPassword,
-          avatar_url: avatarUrl || DEFAULT_AVATAR
+        .insert([{ 
+          id: uuidv4(), 
+          username, 
+          password: newPassword, 
+          avatar_url: DEFAULT_AVATAR 
         }]);
 
       if (insertError) {
-        console.error('ユーザーの登録中にエラーが発生しました:', insertError);
-        setError('ユーザーの登録中にエラーが発生しました');
-      } else {
-        setLoginState('login');
+        console.error('ユーザー登録中にエラーが発生しました:', insertError);
+        setError('ユーザー登録中にエラーが発生しました');
+        return;
       }
+
+      setLoginState('login');
+      setError('登録が完了しました。ログインしてください。');
     } catch (error) {
-      console.error('登録中にエラーが発生しました:', error);
-      setError('登録中にエラーが発生しました');
+      console.error('ユーザー登録中にエラーが発生しました:', error);
+      setError('ユーザー登録中にエラーが発生しました');
     }
   };
 
-  const handleLogout = () => {
-    setIsChatVisible(false);
-    setLoginState('login');
-    setMessages([]);
-  };
-
   const handleUpdateAvatar = async () => {
+    if (!avatarUrl) {
+      setError('新しいアバターURLを入力してください');
+      return;
+    }
+
     try {
-      const { error } = await supabase
+      // ユーザーテーブルの更新
+      const { error: userError } = await supabase
         .from('users')
         .update({ avatar_url: avatarUrl })
         .eq('username', username);
 
-      if (error) {
-        console.error('アバターの更新中にエラーが発生しました:', error);
+      if (userError) {
+        console.error('ユーザーアバターの更新中にエラーが発生しました:', userError);
         setError('アバターの更新中にエラーが発生しました');
-      } else {
-        setAvatarUrl(avatarUrl);
-        setShowSettings(false);
+        return;
       }
+
+      // chat_dataテーブルの更新
+      const { error: chatError } = await supabase
+        .from('chat_data')
+        .update({ avatar_url: avatarUrl })
+        .eq('username', username);
+
+      if (chatError) {
+        console.error('チャットメッセージのアバター更新中にエラーが発生しました:', chatError);
+        setError('アバターの更新中にエラーが発生しました');
+        return;
+      }
+
+      // メッセージリストの再取得
+      fetchMessages();
+
+      // 現在のユーザーのavatarUrlを更新
+      setAvatarUrl(avatarUrl);
+      localStorage.setItem('avatarUrl', avatarUrl);
+      
     } catch (error) {
       console.error('アバターの更新中にエラーが発生しました:', error);
       setError('アバターの更新中にエラーが発生しました');
     }
   };
 
-  const renderChat = () => (
-    <div className="chat-container">
-      <div className="chat-header">
-        <h2>チャット</h2>
-        <button className="chat-settings-button" onClick={() => setShowSettings(!showSettings)}>
-          ⚙️
-        </button>
-        {showSettings && (
-          <div className="chat-settings-menu">
-            <input
-              type="text"
-              placeholder="新しいアバターURL"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-            />
-            <button className="chat-button" onClick={handleUpdateAvatar}>アバターを更新</button>
-            <button className="chat-button" onClick={handleLogout}>ログアウト</button>
-          </div>
-        )}
-      </div>
-      <div className="chat-messages">
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`chat-message ${
-              message.username === username ? 'chat-message-right' : 'chat-message-left'
-            }`}
-          >
-            <img src={message.avatar_url || DEFAULT_AVATAR} alt="avatar" className="chat-avatar" />
-            <div className="chat-message-content">
-              <strong>{message.username}</strong>
-              <p>{message.content}</p>
-            </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="chat-input-container">
-        <textarea
-          className="chat-textarea"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="メッセージを入力..."
-        />
-        <button className="chat-button" onClick={handleSendMessage}>送信</button>
-      </div>
-    </div>
-  );
+  const handleLogout = () => {
+    localStorage.removeItem('username');
+    localStorage.removeItem('avatarUrl');
+    setUsername('');
+    setPassword('');
+    setNewPassword('');
+    setAvatarUrl('');
+    setIsChatVisible(false);
+    setLoginState('login');
+  };
 
   const renderLogin = () => (
     <div className="chat-login-container">
@@ -261,8 +256,8 @@ export default function Chat() {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button className="chat-button" onClick={handleLogin}>ログイン</button>
-      <div className="chat-error">{error}</div>
       <button className="chat-button" onClick={() => setLoginState('register')}>新規登録</button>
+      {error && <div className="chat-error">{error}</div>}
     </div>
   );
 
@@ -281,21 +276,63 @@ export default function Chat() {
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
       />
-      <input
-        type="text"
-        placeholder="アバターURL (オプション)"
-        value={avatarUrl}
-        onChange={(e) => setAvatarUrl(e.target.value)}
-      />
       <button className="chat-button" onClick={handleRegister}>登録</button>
-      <div className="chat-error">{error}</div>
-      <button className="chat-button" onClick={() => setLoginState('login')}>ログインへ戻る</button>
+      <button className="chat-button" onClick={() => setLoginState('login')}>ログイン画面に戻る</button>
+      {error && <div className="chat-error">{error}</div>}
+    </div>
+  );
+
+  const renderChat = () => (
+    <div className="chat-container">
+      <div className="chat-header">
+        <h2>チャット</h2>
+        <button className="chat-settings-button" onClick={() => setShowSettings(!showSettings)}>
+          ⚙
+        </button>
+        {showSettings && (
+          <div className="chat-settings-menu">
+            <h3>設定</h3>
+            <input
+              type="text"
+              placeholder="新しいアバター URL"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+            />
+            <button className="chat-button" onClick={handleUpdateAvatar}>アバターを更新</button>
+            <button className="chat-button" onClick={handleLogout}>ログアウト</button>
+          </div>
+        )}
+      </div>
+      <div className="chat-messages">
+        {messages.map((msg) => (
+          <div key={msg.id} className={`chat-message ${msg.username === username ? 'own-message' : ''}`}>
+            <img src={msg.avatar_url || DEFAULT_AVATAR} alt="Avatar" className="chat-avatar" />
+            <div className="chat-message-content">
+              <strong>{msg.username}</strong>
+              <p>{msg.content}</p>
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+      <div className="chat-input-container">
+        <textarea
+          className="chat-textarea"
+          placeholder="メッセージを入力..."
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <button className="chat-button" onClick={handleSendMessage}>送信</button>
+      </div>
     </div>
   );
 
   return (
     <div>
-      {loginState === 'chat' ? renderChat() : loginState === 'register' ? renderRegister() : renderLogin()}
+      {loginState === 'login' && renderLogin()}
+      {loginState === 'register' && renderRegister()}
+      {loginState === 'chat' && renderChat()}
     </div>
   );
 }
