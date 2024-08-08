@@ -160,3 +160,20 @@ input, textarea {
   padding: 1rem;
   text-align: center;
 }
+
+/*スライドイン*/
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-down {
+  animation: slide-down 2s ease-out;
+}
+

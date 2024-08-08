@@ -26,10 +26,11 @@ const About = () => {
             <div className="text-lg font-bold minecraft-font">例のやつ</div>
           </div>
           <div className="flex space-x-4 minecraft-font">
-            <Link href="/" className="nav-link">Home</Link>
-            <Link href="/about" className="nav-link">About</Link>
-            <Link href="/contact" className="nav-link">Contact</Link>
-            <Link href="/enjoy" className="nav-link">Enjoy</Link>
+          <Link href="/" className="nav-link"><span>Home</span></Link>
+            <Link href="/about" className="nav-link"><span>About</span></Link>
+            <Link href="/contact" className="nav-link"><span>Contact</span></Link>
+            <Link href="/enjoy" className="nav-link"><span>Enjoy</span></Link>
+            <Link href="/chat" className="nav-link">Chat</Link>
           </div>
         </nav>
 

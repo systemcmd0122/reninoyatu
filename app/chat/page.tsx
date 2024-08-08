@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useRef, KeyboardEvent } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import './styles.css';
@@ -22,23 +22,22 @@ interface UserData {
   avatar_url?: string;
 }
 
-export default function Chat() {
+const Chat = () => {
   const [messages, setMessages] = useState<ChatData[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState(DEFAULT_AVATAR);
   const [loginState, setLoginState] = useState<'login' | 'register' | 'chat'>('login');
-  const [isChatVisible, setIsChatVisible] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [error, setError] = useState('');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -47,13 +46,25 @@ export default function Chat() {
     if (storedUsername) {
       setUsername(storedUsername);
       setAvatarUrl(storedAvatarUrl || DEFAULT_AVATAR);
-      setIsChatVisible(true);
       setLoginState('chat');
     }
   }, []);
 
   useEffect(() => {
-    if (isChatVisible) {
+    if (loginState === 'chat') {
+      const fetchMessages = async () => {
+        const { data, error } = await supabase
+          .from('chat_data')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          console.error('メッセージの取得中にエラーが発生しました:', error);
+        } else {
+          setMessages(data as ChatData[]);
+        }
+      };
+
       fetchMessages();
 
       const subscription = supabase
@@ -63,7 +74,7 @@ export default function Chat() {
           schema: 'public',
           table: 'chat_data',
         }, () => {
-          fetchMessages();  // メッセージを再取得
+          fetchMessages();
         })
         .subscribe();
 
@@ -71,24 +82,11 @@ export default function Chat() {
         subscription.unsubscribe();
       };
     }
-  }, [isChatVisible]);
+  }, [loginState]);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
-
-  const fetchMessages = async () => {
-    const { data, error } = await supabase
-      .from('chat_data')
-      .select('*')
-      .order('created_at', { ascending: true });
-
-    if (error) {
-      console.error('メッセージの取得中にエラーが発生しました:', error);
-    } else {
-      setMessages(data as ChatData[]);
-    }
-  };
+  }, [messages, scrollToBottom]);
 
   const handleSendMessage = async () => {
     if (newMessage.trim() === '' || !username) return;
@@ -101,7 +99,7 @@ export default function Chat() {
           content: newMessage,
           created_at: new Date().toISOString(),
           username,
-          avatar_url: avatarUrl || DEFAULT_AVATAR
+          avatar_url: avatarUrl
         }
       ]);
 
@@ -112,7 +110,7 @@ export default function Chat() {
     }
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       handleSendMessage();
@@ -136,7 +134,6 @@ export default function Chat() {
       setAvatarUrl(data.avatar_url || DEFAULT_AVATAR);
       localStorage.setItem('username', username);
       localStorage.setItem('avatarUrl', data.avatar_url || DEFAULT_AVATAR);
-      setIsChatVisible(true);
       setLoginState('chat');
     } catch (error) {
       console.error('ログイン中にエラーが発生しました:', error);
@@ -192,7 +189,6 @@ export default function Chat() {
     }
 
     try {
-      // ユーザーテーブルの更新
       const { error: userError } = await supabase
         .from('users')
         .update({ avatar_url: avatarUrl })
@@ -204,7 +200,6 @@ export default function Chat() {
         return;
       }
 
-      // chat_dataテーブルの更新
       const { error: chatError } = await supabase
         .from('chat_data')
         .update({ avatar_url: avatarUrl })
@@ -216,10 +211,6 @@ export default function Chat() {
         return;
       }
 
-      // メッセージリストの再取得
-      fetchMessages();
-
-      // 現在のユーザーのavatarUrlを更新
       setAvatarUrl(avatarUrl);
       localStorage.setItem('avatarUrl', avatarUrl);
       
@@ -235,9 +226,31 @@ export default function Chat() {
     setUsername('');
     setPassword('');
     setNewPassword('');
-    setAvatarUrl('');
-    setIsChatVisible(false);
+    setAvatarUrl(DEFAULT_AVATAR);
     setLoginState('login');
+  };
+
+  const handleDeleteMessages = async () => {
+    try {
+      const { error } = await supabase
+        .from('chat_data')
+        .delete()
+        .neq('username', username);
+
+      if (error) {
+        console.error('メッセージの削除中にエラーが発生しました:', error);
+        setError('メッセージの削除中にエラーが発生しました');
+        return;
+      }
+    } catch (error) {
+      console.error('メッセージの削除中にエラーが発生しました:', error);
+      setError('メッセージの削除中にエラーが発生しました');
+    }
+  };
+
+  const linkify = (text: string) => {
+    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
   };
 
   const renderLogin = () => (
@@ -272,7 +285,7 @@ export default function Chat() {
       />
       <input
         type="password"
-        placeholder="パスワード"
+        placeholder="新しいパスワード"
         value={newPassword}
         onChange={(e) => setNewPassword(e.target.value)}
       />
@@ -307,10 +320,7 @@ export default function Chat() {
         {messages.map((msg) => (
           <div key={msg.id} className={`chat-message ${msg.username === username ? 'own-message' : ''}`}>
             <img src={msg.avatar_url || DEFAULT_AVATAR} alt="Avatar" className="chat-avatar" />
-            <div className="chat-message-content">
-              <strong>{msg.username}</strong>
-              <p>{msg.content}</p>
-            </div>
+            <div className="chat-message-content" dangerouslySetInnerHTML={{ __html: linkify(msg.content) }} />
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -336,3 +346,5 @@ export default function Chat() {
     </div>
   );
 }
+
+export default Chat;

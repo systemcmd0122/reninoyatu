@@ -17,6 +17,7 @@ const HOME = () => {
             <Link href="/about" className="nav-link"><span>About</span></Link>
             <Link href="/contact" className="nav-link"><span>Contact</span></Link>
             <Link href="/enjoy" className="nav-link"><span>Enjoy</span></Link>
+            <Link href="/chat" className="nav-link">Chat</Link>
           </div>
         </nav>
         <main className="flex-grow flex flex-col items-center justify-center">
