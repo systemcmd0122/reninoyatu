@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FaYoutube, FaDiscord } from 'react-icons/fa';
+import { FaYoutube, FaDiscord, FaTwitter } from 'react-icons/fa';
 import { SiScratch } from 'react-icons/si';
 
 const About = () => {
@@ -10,6 +10,7 @@ const About = () => {
     { name: 'YouTube', icon: FaYoutube, url: 'https://www.youtube.com/@%E4%BE%8B%E3%81%AE%E3%83%A4%E3%83%84', color: 'bg-red-600' },
     { name: 'Discord', icon: FaDiscord, url: 'https://discord.gg/mQQhVRpuqa', color: 'bg-indigo-600' },
     { name: 'Scratch', icon: SiScratch, url: 'https://scratch.mit.edu/users/min-brother/', color: 'bg-orange-500' },
+    { name: 'X', icon: FaTwitter, url: 'https://twitter.com/min_brother2158', color: 'bg-blue-500' }, 
   ];
 
   return (
@@ -92,6 +93,20 @@ const About = () => {
                   <span className="text-2xl font-bold minecraft-font">{link.name}</span>
                 </motion.a>
               ))}
+            </div>
+          </motion.div>
+
+          {/* 座右の銘 */}
+          <motion.div
+            className="w-full max-w-6xl mt-12"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <h2 className="text-3xl font-bold mb-6 text-center text-white minecraft-font">座右の銘</h2>
+            <div className="flex flex-col items-center">
+              <img src="/meigen.png" alt="座右の銘" className="w-full h-auto max-w-3xl rounded-lg shadow-lg" />
+              <p className="text-2xl font-bold text-white text-center mt-4 minecraft-font">「みかんはこの世の心理である」</p>
             </div>
           </motion.div>
         </main>

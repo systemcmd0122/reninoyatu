@@ -2,31 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* globals.css */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-/* フォント */
+/* Font */
 .minecraft-font {
   font-family: 'Press Start 2P', cursive;
 }
 
-/* 背景画像 */
+/* Background Image */
 .background-image {
-  background-image: url('/back.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(8px);
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
-  transition: opacity 1s ease;
+  background-image: url('/back.png'); /* Background image path */
+  background-size: cover; /* Fit background image to container */
+  background-position: center; /* Center the background image */
+  background-attachment: fixed; /* Fixed background image */
+  z-index: -1; /* Place background behind content */
 }
 
-/* メインコンテンツ */
+/* Main Content */
 .main-content {
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
@@ -35,19 +32,43 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
 }
 
-/* ナビゲーションバー */
+/* Navigation Bar */
 .navbar {
   background-color: rgba(0, 0, 0, 0.8);
   border-bottom: 2px solid #444;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  position: relative;
 }
 
-/* ナビゲーションバー内リンク */
+.navbar img {
+  height: 2rem;
+  width: 2rem;
+}
+
+.navbar-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Navigation Links */
+.navbar-links {
+  display: flex;
+  gap: 1rem;
+}
+
 .nav-link {
   padding: 0.5rem 1rem;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7); /* Same color as main content */
   border: 2px solid #666;
   box-shadow: 2px 2px 0 #333;
   text-decoration: none;
@@ -58,7 +79,6 @@
   overflow: hidden;
 }
 
-/* ボタンにゲーミング風の光エフェクトを追加 */
 .nav-link::before {
   content: '';
   position: absolute;
@@ -73,13 +93,11 @@
   z-index: 0;
 }
 
-/* ボタンの内容 */
 .nav-link span {
   position: relative;
   z-index: 1;
 }
 
-/* ホバー時のゲーミング光エフェクト */
 .nav-link:hover {
   background-color: rgba(0, 0, 0, 0.8);
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.6), 0 0 35px rgba(0, 255, 255, 0.4);
@@ -89,7 +107,6 @@
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* 押されたときのアニメーション */
 .nav-link:active {
   background-color: rgba(0, 0, 0, 0.9);
   box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
@@ -97,69 +114,49 @@
   transition: transform 0.1s ease, background-color 0.1s ease;
 }
 
-/* 上から滑らかにスライドダウンする */
-@keyframes slide-down {
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.slide-down {
-  animation: slide-down 1s ease-in-out;
-}
-
-/* 自己紹介 */
-.intro-container {
-  display: flex;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.intro-icon {
-  width: 200px;
-  height: 200px;
-  margin-right: 3rem;
-  border-radius: 50%;
-}
-
-.intro-content {
-  text-align: left;
-}
-
-.intro-title {
-  font-size: 4rem;
+/* Hero Section */
+.hero-section {
+  font-size: 3rem;
   font-weight: bold;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
-.intro-content p {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+/* Feature Item */
+.feature-item, .news-item, .recommended-item {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+  border-radius: 0.375rem;
 }
 
-/* レスポンシブデザイン */
-@media (max-width: 768px) {
-  .intro-container {
-    flex-direction: column;
-    text-align: center;
-  }
+/* Form Inputs */
+input, textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #444;
+  border-radius: 0.375rem;
+  margin-bottom: 1rem;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.9);
+}
 
-  .intro-icon {
-    margin-right: 0;
-    margin-bottom: 2rem;
-  }
+.contact-form-button {
+  background-color: #0070f3;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
 
-  .intro-title {
-    font-size: 3rem;
-  }
+.contact-form-button:hover {
+  background-color: #005bb5;
+}
 
-  .intro-content p {
-    font-size: 1.2rem;
-  }
+/* Footer */
+.footer {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  text-align: center;
 }
