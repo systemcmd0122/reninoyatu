@@ -1,3 +1,5 @@
+import DesignProvider from '@/common/providers/design_provider'
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -11,12 +13,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang='ja'>
+      <body>
+        <DesignProvider>{children}</DesignProvider>
+      </body>
     </html>
-  );
+  )
 }

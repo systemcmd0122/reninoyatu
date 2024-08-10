@@ -13,7 +13,7 @@ const Enjoy = () => {
         <nav className="w-full p-4 navbar text-white flex justify-between items-center slide-down">
           <div className="flex items-center space-x-2 slide-down">
             <img src="/icon.png" alt="Icon" className="slide-down h-8 w-8" />
-            <div className="text-lg font-bold minecraft-font slide-down">例のやつ</div>
+            <div className="text-lg font-bold minecraft-font slide-down">例のやつ：Enjoy</div>
           </div>
           <div className="flex space-x-4 minecraft-font slide-down">
           <Link href="/" className="nav-link"><span>Home</span></Link>
@@ -26,6 +26,9 @@ const Enjoy = () => {
         <main className="flex-grow flex flex-col items-center justify-center">
           <Clicker />
         </main>
+        <footer className="footer bg-gray-800 text-white p-4 text-center">
+          <p>© 2024 例のやつ. All rights reserved.</p>
+        </footer>
       </div>
     </div>
   );

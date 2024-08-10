@@ -10,7 +10,7 @@ const HOME = () => {
         <nav className="w-full p-4 navbar text-white flex justify-between items-center slide-down">
           <div className="flex items-center space-x-2 slide-down">
             <img src="/icon.png" alt="Icon" className="slide-down h-8 w-8" />
-            <div className="text-lg font-bold minecraft-font slide-down">例のやつ</div>
+            <div className="text-lg font-bold minecraft-font slide-down">例のやつ：Home</div>
           </div>
           <div className="flex space-x-4 minecraft-font slide-down">
             <Link href="/" className="nav-link"><span>Home</span></Link>
@@ -29,7 +29,7 @@ const HOME = () => {
           </header>
 
           {/* サイトの概要 */}
-          <section className="overview-section bg-white bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center">
+          <section className="overview-section bg-zinc-800 bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center">
             <h2 className="text-4xl font-bold mb-4">サイトの概要</h2>
             <p className="text-xl mb-8">このサイトが提供する内容や期待できることを簡潔に説明します。</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -49,7 +49,7 @@ const HOME = () => {
           </section>
 
           {/* 最新情報やニュース */}
-          <section className="news-section bg-gray-100 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center my-8">
+          <section className="news-section bg-zinc-800 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center my-8">
             <h2 className="text-4xl font-bold mb-4">最新情報やニュース</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="news-item p-4 bg-white rounded-lg shadow-md">
@@ -64,7 +64,7 @@ const HOME = () => {
           </section>
 
           {/* おすすめコンテンツ */}
-          <section className="recommended-section bg-white bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center my-8">
+          <section className="recommended-section bg-zinc-800 bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center my-8">
             <h2 className="text-4xl font-bold mb-4">おすすめコンテンツ</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="recommended-item p-4 bg-gray-200 rounded-lg">
@@ -76,18 +76,6 @@ const HOME = () => {
                 <p>コンテンツ2の説明をここに書きます。</p>
               </div>
             </div>
-          </section>
-
-          {/* コンタクト情報 */}
-          <section className="contact-section bg-white bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center my-8">
-            <h2 className="text-4xl font-bold mb-4">お問い合わせ</h2>
-            <p className="text-xl mb-4">お問い合わせはこちらからどうぞ。</p>
-            <form className="contact-form grid grid-cols-1 gap-4">
-              <input type="text" className="p-2 rounded-lg border border-gray-300" placeholder="お名前" />
-              <input type="email" className="p-2 rounded-lg border border-gray-300" placeholder="メールアドレス" />
-              <textarea className="p-2 rounded-lg border border-gray-300" rows={4} placeholder="メッセージ"></textarea>
-              <button type="submit" className="btn-primary">送信</button>
-            </form>
           </section>
         </main>
         <footer className="footer bg-gray-800 text-white p-4 text-center">

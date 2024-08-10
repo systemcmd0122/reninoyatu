@@ -23,7 +23,7 @@ const About = () => {
         <nav className="navbar w-full p-4 text-white flex justify-between items-center slide-down">
           <div className="flex items-center space-x-2">
             <img src="/icon.png" alt="Icon" className="h-8 w-8" />
-            <div className="text-lg font-bold minecraft-font">例のやつ</div>
+            <div className="text-lg font-bold minecraft-font">例のやつ：About</div>
           </div>
           <div className="flex space-x-4 minecraft-font">
           <Link href="/" className="nav-link"><span>Home</span></Link>
@@ -110,6 +110,9 @@ const About = () => {
               <p className="text-2xl font-bold text-white text-center mt-4 minecraft-font">「みかんはこの世の心理である」</p>
             </div>
           </motion.div>
+          <footer className="footer bg-gray-800 text-white p-4 text-center w-full">
+          <p>© 2024 例のやつ. All rights reserved.</p>
+        </footer>
         </main>
       </div>
     </div>

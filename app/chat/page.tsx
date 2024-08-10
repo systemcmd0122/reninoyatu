@@ -1,9 +1,22 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback, MouseEvent, KeyboardEvent } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { v4 as uuidv4 } from 'uuid';
 import './styles.css';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
+import {
+  Button,
+  Flex,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  InputGroup,
+  InputRightElement,
+  VStack,
+} from '@/common/design';
 
 const DEFAULT_AVATAR = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
 
@@ -13,390 +26,226 @@ interface ChatData {
   created_at: string;
   username: string;
   avatar_url?: string;
-  isEditing?: boolean;
-}
-
-interface UserData {
-  id: string;
-  username: string;
-  password: string;
-  avatar_url?: string;
 }
 
 const Chat = () => {
   const [messages, setMessages] = useState<ChatData[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(DEFAULT_AVATAR);
-  const [loginState, setLoginState] = useState<'login' | 'register' | 'chat'>('login');
-  const [showSettings, setShowSettings] = useState(false);
-  const [error, setError] = useState('');
-  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
-  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; messageId: string } | null>(null);
+  const [isSignup, setIsSignup] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const { handleSubmit, register, reset } = useForm();
+  const router = useRouter();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    const storedAvatarUrl = localStorage.getItem('avatarUrl');
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from('chat_data')
+        .select('*')
+        .order('created_at', { ascending: true });
 
-    if (storedUsername) {
-      setUsername(storedUsername);
-      setAvatarUrl(storedAvatarUrl || DEFAULT_AVATAR);
-      setLoginState('chat');
-    }
+      if (error) {
+        console.error('メッセージの取得中にエラーが発生しました:', error);
+      } else {
+        setMessages(data as ChatData[]);
+      }
+    };
+
+    fetchMessages();
+
+    const subscription = supabase
+      .channel('public:chat_data')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'chat_data',
+      }, () => {
+        fetchMessages();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
-
-  useEffect(() => {
-    if (loginState === 'chat') {
-      const fetchMessages = async () => {
-        const { data, error } = await supabase
-          .from('chat_data')
-          .select('*')
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('メッセージの取得中にエラーが発生しました:', error);
-        } else {
-          setMessages(data as ChatData[]);
-        }
-      };
-
-      fetchMessages();
-
-      const subscription = supabase
-        .channel('public:chat_data')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'chat_data',
-        }, () => {
-          fetchMessages();
-        })
-        .subscribe();
-
-      return () => {
-        subscription.unsubscribe();
-      };
-    }
-  }, [loginState]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  const onSubmit = handleSubmit(async (data) => {
+    if (isSignup) {
+      if (data.password !== data.confirm) {
+        alert('パスワードが一致しません');
+        return;
+      }
+      const { error } = await supabase
+        .from('users')
+        .insert([{ username: data.username, password: data.password, avatar_url: DEFAULT_AVATAR }]);
+      
+      if (error) {
+        alert('エラーが発生しました: ' + error.message);
+      } else {
+        alert('ユーザー登録が成功しました！');
+        setUsername(data.username);
+        setAvatarUrl(DEFAULT_AVATAR);
+        reset();
+        router.push('/chat');
+      }
+    } else {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('username, password, avatar_url')
+        .eq('username', data.username)
+        .single();
+      
+      if (userError || !userData) {
+        alert('ユーザー名が見つかりません');
+        return;
+      }
+      
+      if (userData.password !== data.password) {
+        alert('パスワードが違います');
+        return;
+      }
+      
+      alert('ログイン成功！');
+      setUsername(userData.username);
+      setAvatarUrl(userData.avatar_url || DEFAULT_AVATAR);
+      reset();
+      router.push('/chat');
+    }
+  });
+
   const handleSendMessage = async () => {
     if (newMessage.trim() === '' || !username) return;
 
-    if (editingMessageId) {
-      await handleEditMessage(editingMessageId, newMessage);
-    } else {
-      const { error } = await supabase
-        .from('chat_data')
-        .insert([
-          {
-            id: uuidv4(),
-            content: newMessage,
-            created_at: new Date().toISOString(),
-            username,
-            avatar_url: avatarUrl
-          }
-        ]);
+    const { error } = await supabase
+      .from('chat_data')
+      .insert([
+        {
+          id: uuidv4(),
+          content: newMessage,
+          created_at: new Date().toISOString(),
+          username,
+          avatar_url: avatarUrl
+        }
+      ]);
 
-      if (error) {
-        console.error('メッセージの送信中にエラーが発生しました:', error);
-      }
+    if (error) {
+      console.error('メッセージの送信中にエラーが発生しました:', error);
     }
 
     setNewMessage('');
-    setEditingMessageId(null);
-    setContextMenu(null); // 右クリックメニューを消す
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault();
-      if (event.shiftKey) {
-        return; // Shift + Enterで改行
-      }
       handleSendMessage();
     }
   };
 
-  const handleLogin = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .eq('password', password)
-        .single();
-
-      if (error || !data) {
-        setError('ユーザー名またはパスワードが正しくありません');
-        return;
-      }
-
-      setAvatarUrl(data.avatar_url || DEFAULT_AVATAR);
-      localStorage.setItem('username', username);
-      localStorage.setItem('avatarUrl', data.avatar_url || DEFAULT_AVATAR);
-      setLoginState('chat');
-    } catch (error) {
-      console.error('ログイン中にエラーが発生しました:', error);
-      setError('ログイン中にエラーが発生しました');
-    }
-  };
-
-  const handleRegister = async () => {
-    if (!username || !newPassword) {
-      setError('ユーザー名とパスワードを入力してください');
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('username', username)
-        .single();
-
-      if (data) {
-        setError('このユーザー名は既に使用されています');
-        return;
-      }
-
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert([{ 
-          id: uuidv4(), 
-          username, 
-          password: newPassword, 
-          avatar_url: DEFAULT_AVATAR 
-        }]);
-
-      if (insertError) {
-        console.error('ユーザー登録中にエラーが発生しました:', insertError);
-        setError('ユーザー登録中にエラーが発生しました');
-        return;
-      }
-
-      setLoginState('login');
-      setError('登録が完了しました。ログインしてください。');
-    } catch (error) {
-      console.error('ユーザー登録中にエラーが発生しました:', error);
-      setError('ユーザー登録中にエラーが発生しました');
-    }
-  };
-
-  const handleUpdateAvatar = async () => {
-    if (!avatarUrl) {
-      setError('新しいアバターURLを入力してください');
-      return;
-    }
-
-    try {
-      const { error: userError } = await supabase
-        .from('users')
-        .update({ avatar_url: avatarUrl })
-        .eq('username', username);
-
-      if (userError) {
-        console.error('ユーザーアバターの更新中にエラーが発生しました:', userError);
-        setError('アバターの更新中にエラーが発生しました');
-        return;
-      }
-
-      const { error: chatError } = await supabase
-        .from('chat_data')
-        .update({ avatar_url: avatarUrl })
-        .eq('username', username);
-
-      if (chatError) {
-        console.error('チャットメッセージのアバター更新中にエラーが発生しました:', chatError);
-        setError('アバターの更新中にエラーが発生しました');
-        return;
-      }
-
-      setAvatarUrl(avatarUrl);
-      localStorage.setItem('avatarUrl', avatarUrl);
-      
-    } catch (error) {
-      console.error('アバターの更新中にエラーが発生しました:', error);
-      setError('アバターの更新中にエラーが発生しました');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('username');
-    localStorage.removeItem('avatarUrl');
-    setUsername('');
-    setPassword('');
-    setNewPassword('');
-    setAvatarUrl(DEFAULT_AVATAR);
-    setLoginState('login');
-  };
-
-  const linkify = (text: string) => {
-    const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-    return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
-  };
-
-  const handleDeleteMessage = async (messageId: string) => {
-    const { error } = await supabase
-      .from('chat_data')
-      .delete()
-      .eq('id', messageId);
-
-    if (error) {
-      console.error('メッセージの削除中にエラーが発生しました:', error);
-    }
-  };
-
-  const handleEditMessage = async (messageId: string | null, newContent: string) => {
-    if (!messageId || !newContent.trim()) return;
-
-    const { error } = await supabase
-      .from('chat_data')
-      .update({ content: newContent })
-      .eq('id', messageId);
-
-    if (error) {
-      console.error('メッセージの編集中にエラーが発生しました:', error);
-    } else {
-      setEditingMessageId(null);
-      setNewMessage('');
-      setContextMenu(null); // 右クリックメニューを消す
-    }
-  };
-
-  const handleContextMenu = (event: MouseEvent, messageId: string) => {
-    event.preventDefault();
-    const message = messages.find(msg => msg.id === messageId);
-    if (message && message.username === username) {
-      setContextMenu({ x: event.clientX, y: event.clientY, messageId });
-    }
-  };
-
-  const handleMenuAction = (action: 'edit' | 'delete') => {
-    if (contextMenu) {
-      if (action === 'delete') {
-        handleDeleteMessage(contextMenu.messageId);
-      } else if (action === 'edit') {
-        const messageToEdit = messages.find(msg => msg.id === contextMenu.messageId);
-        if (messageToEdit) {
-          setEditingMessageId(contextMenu.messageId);
-          setNewMessage(messageToEdit.content);
-        }
-      }
-      setContextMenu(null);
-    }
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (contextMenu && containerRef.current && !containerRef.current.contains(event.target as Node)) {
-      setContextMenu(null);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as unknown as EventListener);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as unknown as EventListener);
-    };
-  }, [contextMenu]);
-
-  const renderLogin = () => (
-    <div className="chat-login-container">
-      <h2>ログイン</h2>
-      <input
-        type="text"
-        placeholder="ユーザー名"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="パスワード"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button className="chat-button" onClick={handleLogin}>ログイン</button>
-      <button className="chat-button" onClick={() => setLoginState('register')}>新規登録</button>
-      {error && <div className="chat-error">{error}</div>}
-    </div>
-  );
-
-  const renderRegister = () => (
-    <div className="chat-register-container">
-      <h2>新規登録</h2>
-      <input
-        type="text"
-        placeholder="ユーザー名"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="新しいパスワード"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
-      <button className="chat-button" onClick={handleRegister}>登録</button>
-      <button className="chat-button" onClick={() => setLoginState('login')}>ログイン画面に戻る</button>
-      {error && <div className="chat-error">{error}</div>}
-    </div>
+  const renderAuth = () => (
+    <Flex
+      flexDirection='column'
+      width='100%'
+      height='100vh'
+      justifyContent='center'
+      alignItems='center'
+    >
+      <VStack spacing='5'>
+        <Heading>{isSignup ? '新規登録' : 'ログイン'}</Heading>
+        <form onSubmit={onSubmit}>
+          <VStack spacing='4' alignItems='left'>
+            <FormControl>
+              <FormLabel htmlFor='username' textAlign='start'>
+                ユーザーネーム
+              </FormLabel>
+              <Input id='username' {...register('username')} bg='white' />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor='password'>パスワード</FormLabel>
+              <InputGroup size='md'>
+                <Input
+                  pr='4.5rem'
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
+                  bg='white'
+                />
+                <InputRightElement width='4.5rem'>
+                  <Button h='1.75rem' size='sm' onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? 'Hide' : 'Show'}
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
+            {isSignup && (
+              <FormControl>
+                <FormLabel htmlFor='confirm'>パスワード確認</FormLabel>
+                <InputGroup size='md'>
+                  <Input
+                    pr='4.5rem'
+                    type={showConfirm ? 'text' : 'password'}
+                    {...register('confirm')}
+                    bg='white'
+                  />
+                  <InputRightElement width='4.5rem'>
+                    <Button h='1.75rem' size='sm' onClick={() => setShowConfirm(!showConfirm)}>
+                      {showConfirm ? 'Hide' : 'Show'}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+            )}
+            <Button
+              marginTop='4'
+              color='white'
+              bg='teal.400'
+              type='submit'
+              paddingX='auto'
+            >
+              {isSignup ? '新規登録' : 'ログイン'}
+            </Button>
+          </VStack>
+        </form>
+        <Button
+          bg='white'
+          color='black'
+          onClick={() => setIsSignup(!isSignup)}
+          width='100%'
+        >
+          {isSignup ? 'ログインはこちらから' : '新規登録はこちらから'}
+        </Button>
+      </VStack>
+    </Flex>
   );
 
   const renderChat = () => (
-    <div className="chat-container" ref={containerRef}>
+    <div className="chat-container">
       <div className="chat-header">
         <h2>チャット</h2>
-        <button className="chat-settings-button" onClick={() => setShowSettings(!showSettings)}>
-          ⚙
-        </button>
-        {showSettings && (
-          <div className="chat-settings-menu" style={{ zIndex: 1000 }}> {/* z-indexを設定 */}
-            <h3>設定</h3>
-            <input
-              type="text"
-              placeholder="新しいアバター URL"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-            />
-            <button className="chat-button" onClick={handleUpdateAvatar}>アバターを更新</button>
-            <button className="chat-button" onClick={handleLogout}>ログアウト</button>
-          </div>
-        )}
       </div>
       <div className="chat-messages">
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`chat-message ${msg.username === username ? 'own-message' : ''}`}
-            onContextMenu={(e) => handleContextMenu(e, msg.id)}
-          >
+          <div key={msg.id} className={`chat-message ${msg.username === username ? 'own-message' : ''}`}>
             <img src={msg.avatar_url || DEFAULT_AVATAR} alt="Avatar" className="chat-avatar" />
             <div className="chat-message-content">
               <span className="chat-message-username">{msg.username}</span>
-              <div dangerouslySetInnerHTML={{ __html: linkify(msg.content) }} />
+              <div>{msg.content}</div>
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
-      {contextMenu && (
-        <div className="chat-context-menu" style={{ top: contextMenu.y, left: contextMenu.x }}>
-          <button onClick={() => handleMenuAction('edit')}>編集</button>
-          <button onClick={() => handleMenuAction('delete')}>削除</button>
-        </div>
-      )}
       <div className="chat-input-container">
         <textarea
           className="chat-textarea"
@@ -406,7 +255,7 @@ const Chat = () => {
           onKeyDown={handleKeyDown}
         />
         <button className="chat-button" onClick={handleSendMessage}>
-          {editingMessageId ? '編集' : '送信'}
+          送信
         </button>
       </div>
     </div>
@@ -414,9 +263,7 @@ const Chat = () => {
 
   return (
     <div>
-      {loginState === 'login' && renderLogin()}
-      {loginState === 'register' && renderRegister()}
-      {loginState === 'chat' && renderChat()}
+      {username ? renderChat() : renderAuth()}
     </div>
   );
 };
