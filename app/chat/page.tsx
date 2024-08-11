@@ -1,3 +1,5 @@
+// Chat.js
+
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -6,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import './styles.css';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Button,
   Flex,
@@ -154,109 +157,134 @@ const Chat = () => {
     }
   };
 
+  const renderNavbar = () => (
+    <nav className="navbar text-white flex justify-between items-center">
+      <div className="flex items-center space-x-2">
+        <img src="/icon.png" alt="Icon" className="h-8 w-8" />
+        <div className="text-lg font-bold minecraft-font rainbow-border">例のやつ：Chat</div>
+      </div>
+      <div className="flex space-x-4 minecraft-font">
+        <Link href="/" className="nav-link"><span>Home</span></Link>
+        <Link href="/about" className="nav-link"><span>About</span></Link>
+        <Link href="/contact" className="nav-link"><span>Contact</span></Link>
+        <Link href="/enjoy" className="nav-link"><span>Enjoy</span></Link>
+        <Link href="/chat" className="nav-link">Chat</Link>
+      </div>
+    </nav>
+  );
+
   const renderAuth = () => (
-    <Flex
-      flexDirection='column'
-      width='100%'
-      height='100vh'
-      justifyContent='center'
-      alignItems='center'
-    >
-      <VStack spacing='5'>
-        <Heading>{isSignup ? '新規登録' : 'ログイン'}</Heading>
-        <form onSubmit={onSubmit}>
-          <VStack spacing='4' alignItems='left'>
-            <FormControl>
-              <FormLabel htmlFor='username' textAlign='start'>
-                ユーザーネーム
-              </FormLabel>
-              <Input id='username' {...register('username')} bg='white' />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor='password'>パスワード</FormLabel>
-              <InputGroup size='md'>
-                <Input
-                  pr='4.5rem'
-                  type={showPassword ? 'text' : 'password'}
-                  {...register('password')}
-                  bg='white'
-                />
-                <InputRightElement width='4.5rem'>
-                  <Button h='1.75rem' size='sm' onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? 'Hide' : 'Show'}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </FormControl>
-            {isSignup && (
-              <FormControl>
-                <FormLabel htmlFor='confirm'>パスワード確認</FormLabel>
-                <InputGroup size='md'>
-                  <Input
-                    pr='4.5rem'
-                    type={showConfirm ? 'text' : 'password'}
-                    {...register('confirm')}
-                    bg='white'
-                  />
-                  <InputRightElement width='4.5rem'>
-                    <Button h='1.75rem' size='sm' onClick={() => setShowConfirm(!showConfirm)}>
-                      {showConfirm ? 'Hide' : 'Show'}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-              </FormControl>
-            )}
+    <div className="relative min-h-screen flex flex-col">
+      <div className="background-image"></div>
+      <div className="main-content flex-grow flex flex-col">
+        {renderNavbar()}
+        <Flex
+          flexDirection='column'
+          width='100%'
+          height='calc(100vh - 64px)'
+          justifyContent='center'
+          alignItems='center'
+        >
+          <VStack spacing='5'>
+            <Heading>{isSignup ? '新規登録' : 'ログイン'}</Heading>
+            <form onSubmit={onSubmit}>
+              <VStack spacing='4' alignItems='left'>
+                <FormControl>
+                  <FormLabel htmlFor='username' textAlign='start'>
+                    ユーザーネーム
+                  </FormLabel>
+                  <Input id='username' {...register('username')} bg='white' />
+                </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor='password'>パスワード</FormLabel>
+                  <InputGroup size='md'>
+                    <Input
+                      pr='4.5rem'
+                      type={showPassword ? 'text' : 'password'}
+                      {...register('password')}
+                      bg='white'
+                    />
+                    <InputRightElement width='4.5rem'>
+                      <Button h='1.75rem' size='sm' onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? 'Hide' : 'Show'}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                </FormControl>
+                {isSignup && (
+                  <FormControl>
+                    <FormLabel htmlFor='confirm'>パスワード確認</FormLabel>
+                    <InputGroup size='md'>
+                      <Input
+                        pr='4.5rem'
+                        type={showConfirm ? 'text' : 'password'}
+                        {...register('confirm')}
+                        bg='white'
+                      />
+                      <InputRightElement width='4.5rem'>
+                        <Button h='1.75rem' size='sm' onClick={() => setShowConfirm(!showConfirm)}>
+                          {showConfirm ? 'Hide' : 'Show'}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
+                  </FormControl>
+                )}
+                <Button
+                  marginTop='4'
+                  color='white'
+                  bg='teal.400'
+                  type='submit'
+                  paddingX='auto'
+                >
+                  {isSignup ? '新規登録' : 'ログイン'}
+                </Button>
+              </VStack>
+            </form>
             <Button
-              marginTop='4'
-              color='white'
-              bg='teal.400'
-              type='submit'
-              paddingX='auto'
+              bg='white'
+              color='black'
+              onClick={() => setIsSignup(!isSignup)}
+              width='100%'
             >
-              {isSignup ? '新規登録' : 'ログイン'}
+              {isSignup ? 'ログインはこちらから' : '新規登録はこちらから'}
             </Button>
           </VStack>
-        </form>
-        <Button
-          bg='white'
-          color='black'
-          onClick={() => setIsSignup(!isSignup)}
-          width='100%'
-        >
-          {isSignup ? 'ログインはこちらから' : '新規登録はこちらから'}
-        </Button>
-      </VStack>
-    </Flex>
+        </Flex>
+      </div>
+    </div>
   );
 
   const renderChat = () => (
-    <div className="chat-container">
-      <div className="chat-header">
-        <h2>チャット</h2>
-      </div>
-      <div className="chat-messages">
-        {messages.map((msg) => (
-          <div key={msg.id} className={`chat-message ${msg.username === username ? 'own-message' : ''}`}>
-            <img src={msg.avatar_url || DEFAULT_AVATAR} alt="Avatar" className="chat-avatar" />
-            <div className="chat-message-content">
-              <span className="chat-message-username">{msg.username}</span>
-              <div>{msg.content}</div>
-            </div>
+    <div className="relative min-h-screen flex flex-col">
+      <div className="background-image"></div>
+      <div className="main-content flex-grow flex flex-col">
+        {renderNavbar()}
+        <div className="chat-container">
+          <div className="chat-messages">
+            {messages.map((msg) => (
+              <div key={msg.id} className={`chat-message ${msg.username === username ? 'own-message' : ''}`}>
+                <img src={msg.avatar_url || DEFAULT_AVATAR} alt="Avatar" className="chat-avatar" />
+                <div className="chat-message-content">
+                  <span className="chat-message-username">{msg.username}</span>
+                  <div>{msg.content}</div>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
           </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="chat-input-container">
-        <textarea
-          className="chat-textarea"
-          placeholder="メッセージを入力..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <button className="chat-button" onClick={handleSendMessage}>
-          送信
-        </button>
+          <div className="chat-input-container">
+            <textarea
+              className="chat-textarea"
+              placeholder="メッセージを入力..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button className="chat-button" onClick={handleSendMessage}>
+              送信
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

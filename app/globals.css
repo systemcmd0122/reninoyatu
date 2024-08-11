@@ -9,19 +9,20 @@
   font-family: 'Press Start 2P', cursive;
 }
 
-/* Background Image */
+/* 背景画像のスタイル */
 .background-image {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url('/back.png'); /* Background image path */
-  background-size: cover; /* Fit background image to container */
-  background-position: center; /* Center the background image */
-  background-attachment: fixed; /* Fixed background image */
-  z-index: -1; /* Place background behind content */
+  background-image: url('/back.png') !important;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: -1; /* 背景画像を最背面に表示 */
 }
+
 
 /* Main Content */
 .main-content {

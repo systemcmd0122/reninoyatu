@@ -1,228 +1,141 @@
 body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-  }
-  
-  .chat-container {
-    width: 100%;
-    height: 100vh;
-    margin: 0;
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border-bottom: 1px solid #e0e0e0;
-  }
-  
-  .chat-header h2 {
-    margin: 0;
-    color: #333;
-  }
-  
-  .chat-settings-button {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .chat-settings-menu {
-    position: absolute;
-    right: 10px;
-    top: 60px;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .chat-messages {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 15px;
-    scroll-behavior: smooth;
-  }
-  
-  .chat-message {
-    display: flex;
-    margin-bottom: 15px;
-    animation: fadeIn 0.3s ease-out;
-  }
-  
-  .chat-message.own-message {
-    justify-content: flex-end;
-  }
-  
-  .chat-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-  
-  .chat-message-content {
-    background-color: #f1f0f0;
-    border-radius: 18px;
-    padding: 10px 15px;
-    max-width: 70%;
-    word-wrap: break-word;
-  }
-  
-  .chat-message-content strong {
-    display: block;
-    margin-bottom: 5px;
-    color: #333;
-  }
-  
-  .chat-message-content p {
-    margin: 0;
-    color: #4a4a4a;
-  }
-  
-  .chat-input-container {
-    display: flex;
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
-  }
-  
-  .chat-textarea {
-    flex-grow: 1;
-    border: 1px solid #e0e0e0;
-    border-radius: 20px;
-    padding: 10px 15px;
-    font-size: 14px;
-    resize: none;
-    outline: none;
-  }
-  
-  .chat-button {
-    background-color: #0084ff;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 10px 20px;
-    margin-left: 10px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .chat-button:hover {
-    background-color: #0073e6;
-  }
-  
-  .chat-login-container,
-  .chat-register-container {
-    max-width: 300px;
-    margin: 100px auto;
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .chat-login-container h2,
-  .chat-register-container h2 {
-    text-align: center;
-    color: #333;
-  }
-  
-  .chat-login-container input,
-  .chat-register-container input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-  }
-  
-  .chat-error {
-    color: red;
-    margin-top: 10px;
-    text-align: center;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  /* 既存のスタイルに追加 */
-  
-  .chat-message-username {
-    font-size: 0.8em;
-    color: #888;
-    margin-bottom: 2px;
-  }
-  
-  .chat-message-content {
-    position: relative;
-  }
-  
-  .chat-message-menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-  }
-  
-  .chat-message-menu button {
-    background: none;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    color: #333;
-  }
-  
-  .chat-message-menu button:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .chat-message-content textarea {
-    width: 100%;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 5px;
-    font-size: 14px;
-    resize: vertical;
-  }
-  
-  /* 既存のスタイルに追加 */
-  
-  .chat-context-menu {
-    position: absolute;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    padding: 5px;
-  }
-  
-  .chat-context-menu button {
-    background: none;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    color: #333;
-    width: 100%;
-    text-align: left;
-  }
-  
-  .chat-context-menu button:hover {
-    background-color: #f0f0f0;
-  }
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background-color: transparent; /* 背景色を透明にする */
+  overflow: hidden; /* スクロールバーを隠す */
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh; /* ビューポートの高さに合わせる */
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #e0e0e0;
+  position: fixed; /* 上部に固定 */
+  top: 0; /* 上からの距離を0に設定 */
+  left: 0; /* 左からの距離を0に設定 */
+  width: 100%; /* 横幅を100%に設定 */
+  background-color: transparent; /* 背景色を透明にする */
+  z-index: 1000; /* 他のコンテンツより上に表示 */
+}
+
+.chat-header h2 {
+  margin: 0;
+  color: #333;
+}
+
+.chat-settings-button {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.chat-settings-menu {
+  position: absolute;
+  right: 10px;
+  top: 60px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto; /* スクロール可能にする */
+  padding: 15px;
+  box-sizing: border-box; /* パディングとボーダーを含めたサイズ設定 */
+  margin-top: 60px; /* ナビゲーションバーの高さを調整 */
+  margin-bottom: 100px; /* メッセージ入力欄の高さを考慮して下にマージンを追加 */
+}
+
+/* スクロールバーを非表示にする */
+.chat-messages::-webkit-scrollbar {
+  display: none; /* Webkit系ブラウザでのスクロールバーを非表示にする */
+}
+
+.chat-message {
+  display: flex;
+  margin-bottom: 15px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.chat-message.own-message {
+  justify-content: flex-end;
+}
+
+.chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chat-message-content {
+  background-color: #f1f0f0;
+  border-radius: 18px;
+  padding: 10px 15px;
+  max-width: 70%;
+  word-wrap: break-word;
+  color: #000; /* メッセージテキストの色を黒にする */
+}
+
+.chat-message-content p {
+  margin: 0;
+  color: #4a4a4a;
+}
+
+.chat-input-container {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid transparent;
+  background-color: transparent; /* 背景色を設定 */
+  box-sizing: border-box; /* パディングとボーダーを含めたサイズ設定 */
+  position: sticky; /* スクロールしないようにする */
+  bottom: 0; /* 画面下部に固定する */
+  width: 100%; /* 横幅を100%に設定 */
+  background-color: transparent; /* 背景色を白に設定 */
+}
+
+.chat-textarea {
+  flex-grow: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: 14px;
+  resize: none;
+  outline: none;
+}
+
+.chat-button {
+  background-color: #0084ff;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px; /* ボタンの内側のパディングを調整 */
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  height: 65px; /* ボタンの高さを設定 */
+  line-height: 20px; /* ボタン内のテキストの位置を調整 */
+}
+
+.chat-button:hover {
+  background-color: #0073e6;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
