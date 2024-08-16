@@ -85,10 +85,29 @@ const Chat = () => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  const validatePassword = (password: string) => {
+    if (!password) return 'パスワードを入力してください';
+    if (/[ぁ-ん]/.test(password)) return 'パスワードにひらがなを使用しないでください';
+    if (!/^[A-Za-z]+$/.test(password)) return 'パスワードは英語のアルファベットのみ使用できます';
+    return null;
+  };
+
   const onSubmit = handleSubmit(async (data) => {
+    const passwordError = validatePassword(data.password);
+    if (passwordError) {
+      alert(passwordError);
+      return;
+    }
+
     if (isSignup) {
-      if (!data.password || !data.confirm) {
-        alert('パスワードを入力してください');
+      if (!data.confirm) {
+        alert('確認用パスワードを入力してください');
+        return;
+      }
+
+      const confirmError = validatePassword(data.confirm);
+      if (confirmError) {
+        alert(confirmError);
         return;
       }
 
