@@ -87,14 +87,20 @@ const Chat = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     if (isSignup) {
+      if (!data.password || !data.confirm) {
+        alert('パスワードを入力してください');
+        return;
+      }
+
       if (data.password !== data.confirm) {
         alert('パスワードが一致しません');
         return;
       }
+
       const { error } = await supabase
         .from('users')
         .insert([{ username: data.username, password: data.password, avatar_url: DEFAULT_AVATAR }]);
-      
+
       if (error) {
         alert('エラーが発生しました: ' + error.message);
       } else {
@@ -110,17 +116,17 @@ const Chat = () => {
         .select('username, password, avatar_url')
         .eq('username', data.username)
         .single();
-      
+
       if (userError || !userData) {
         alert('ユーザー名が見つかりません');
         return;
       }
-      
+
       if (userData.password !== data.password) {
         alert('パスワードが違います');
         return;
       }
-      
+
       alert('ログイン成功！');
       setUsername(userData.username);
       setAvatarUrl(userData.avatar_url || DEFAULT_AVATAR);
