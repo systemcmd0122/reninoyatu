@@ -20,60 +20,56 @@ const HOME = () => {
             <Link href="/chat" className="nav-link">Chat</Link>
           </div>
         </nav>
-        <main className="flex-grow flex flex-col items-center justify-center">
-          {/* ヒーローセクション */}
-          <header className="hero-section flex flex-col items-center justify-center text-center p-8">
-            <h1 className="text-6xl font-bold text-white mb-4">例のやつ</h1>
-            <p className="text-2xl text-white mb-8">ウェブサイトの主なテーマや目的をここに書きます。</p>
-            <Link href="/enjoy" className="btn-primary">今すぐ始める</Link>
-          </header>
+        <main className="flex-grow flex flex-col items-center justify-center px-4 py-8">
+          {/* ウェルカムセクション */}
+          <section className="welcome-section bg-black bg-opacity-70 text-white rounded-lg shadow-lg p-10 w-full max-w-6xl text-center mb-8">
+            <h2 className="text-5xl font-bold mb-6">ようこそ！</h2>
+            <p className="text-xl mb-6">「例のヤツ」のホームページへようこそ。このサイトでは、あなたが興味を持っている情報を見つけたり、参加したりできる様々な機能があります。</p>
+            <p className="text-lg mb-8">さあ、以下のセクションで詳しく見てみましょう！</p>
+          </section>
 
-          {/* サイトの概要 */}
-          <section className="overview-section bg-zinc-800 bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center">
-            <h2 className="text-4xl font-bold mb-4">サイトの概要</h2>
-            <p className="text-xl mb-8">このサイトが提供する内容や期待できることを簡潔に説明します。</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="feature-item p-4 bg-gray-200 rounded-lg">
-                <h3 className="text-2xl font-semibold mb-2">特徴1</h3>
-                <p>特徴1の説明をここに書きます。</p>
+          {/* 機能紹介セクション */}
+          <section className="overview-section bg-black bg-opacity-60 text-white rounded-lg shadow-lg p-10 w-full max-w-6xl text-center mb-8">
+            <h2 className="text-4xl font-bold mb-4">このサイトの機能</h2>
+            <p className="text-xl mb-8">このサイトでは、以下の機能を利用することができます：</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="feature-item p-6 bg-black bg-opacity-70 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold mb-2">チャット</h3>
+                <p>メールアドレスなしでユーザー名とパスワードだけで、オンラインで様々な人とリアルタイムでチャットができます。</p>
               </div>
-              <div className="feature-item p-4 bg-gray-200 rounded-lg">
-                <h3 className="text-2xl font-semibold mb-2">特徴2</h3>
-                <p>特徴2の説明をここに書きます。</p>
-              </div>
-              <div className="feature-item p-4 bg-gray-200 rounded-lg">
-                <h3 className="text-2xl font-semibold mb-2">特徴3</h3>
-                <p>特徴3の説明をここに書きます。</p>
+              <div className="feature-item p-6 bg-black bg-opacity-70 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold mb-2">楽しむ</h3>
+                <p>みんなで「例のやつ」を押しまくって、一定数に達すると特別なボーナスがもらえるかも！</p>
               </div>
             </div>
           </section>
 
-          {/* 最新情報やニュース */}
-          <section className="news-section bg-zinc-800 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center my-8">
+          {/* 最新情報セクション */}
+          <section className="news-section bg-zinc-800 bg-opacity-70 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center mb-8">
             <h2 className="text-4xl font-bold mb-4">最新情報やニュース</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="news-item p-4 bg-white rounded-lg shadow-md">
-                <h3 className="text-2xl font-semibold mb-2">ニュース1</h3>
-                <p>ニュース1の詳細情報をここに書きます。</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="news-item p-6 bg-white bg-opacity-90 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold mb-2">最新ニュース1</h3>
+                <p>最新ニュース1の詳細情報をここに記載します。サイトの最新情報をお見逃しなく！</p>
               </div>
-              <div className="news-item p-4 bg-white rounded-lg shadow-md">
-                <h3 className="text-2xl font-semibold mb-2">ニュース2</h3>
-                <p>ニュース2の詳細情報をここに書きます。</p>
+              <div className="news-item p-6 bg-white bg-opacity-90 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold mb-2">最新ニュース2</h3>
+                <p>最新ニュース2の詳細情報をここに記載します。新しいお知らせやイベント情報をご確認ください。</p>
               </div>
             </div>
           </section>
 
-          {/* おすすめコンテンツ */}
-          <section className="recommended-section bg-zinc-800 bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center my-8">
+          {/* おすすめコンテンツセクション */}
+          <section className="recommended-section bg-zinc-800 bg-opacity-70 rounded-lg shadow-lg p-10 w-full max-w-6xl text-center">
             <h2 className="text-4xl font-bold mb-4">おすすめコンテンツ</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="recommended-item p-4 bg-gray-200 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="recommended-item p-6 bg-gray-200 bg-opacity-90 rounded-lg shadow-md">
                 <h3 className="text-2xl font-semibold mb-2">コンテンツ1</h3>
-                <p>コンテンツ1の説明をここに書きます。</p>
+                <p>コンテンツ1の説明をここに記載します。興味深い内容がたくさんありますので、ぜひチェックしてみてください。</p>
               </div>
-              <div className="recommended-item p-4 bg-gray-200 rounded-lg">
+              <div className="recommended-item p-6 bg-gray-200 bg-opacity-90 rounded-lg shadow-md">
                 <h3 className="text-2xl font-semibold mb-2">コンテンツ2</h3>
-                <p>コンテンツ2の説明をここに書きます。</p>
+                <p>コンテンツ2の説明をここに記載します。皆さんに役立つ情報や面白いコンテンツが満載です。</p>
               </div>
             </div>
           </section>

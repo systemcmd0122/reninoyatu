@@ -115,12 +115,6 @@
   transition: transform 0.1s ease, background-color 0.1s ease;
 }
 
-/* Hero Section */
-.hero-section {
-  font-size: 3rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
 
 /* Feature Item */
 .feature-item, .news-item, .recommended-item {

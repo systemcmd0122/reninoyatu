@@ -1,141 +1,216 @@
+/* bodyとhtmlタグのデフォルトのマージンとパディングをリセットし、全体の高さを100%に設定 */
 body, html {
   margin: 0;
   padding: 0;
   height: 100%;
   font-family: Arial, sans-serif;
-  background-color: transparent; /* 背景色を透明にする */
-  overflow: hidden; /* スクロールバーを隠す */
+  background-color: transparent;
+  overflow: hidden;
 }
 
+/* 固定されたナビゲーションバーのスタイル設定 */
+.navbar {
+  position: sticky; /* ビューポートの上部に固定 */
+  top: 0; /* 上端に配置 */
+  z-index: 1000; /* 他の要素よりも前面に表示 */
+  background-color: rgba(0, 0, 0, 0.8); /* 半透明の黒背景 */
+}
+
+/* メインコンテンツエリアの高さとスクロール設定 */
+.main-content {
+  height: calc(100vh - 64px); /* ビューポートの高さから64px引いた高さ */
+  overflow-y: hidden; /* 縦方向のスクロールを隠す */
+}
+
+/* チャットコンテナのレイアウト設定 */
 .chat-container {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100vh; /* ビューポートの高さに合わせる */
+  flex-direction: column; /* 縦方向に並べる */
+  height: 100%;
 }
 
-.chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
-  position: fixed; /* 上部に固定 */
-  top: 0; /* 上からの距離を0に設定 */
-  left: 0; /* 左からの距離を0に設定 */
-  width: 100%; /* 横幅を100%に設定 */
-  background-color: transparent; /* 背景色を透明にする */
-  z-index: 1000; /* 他のコンテンツより上に表示 */
-}
-
-.chat-header h2 {
-  margin: 0;
-  color: #333;
-}
-
-.chat-settings-button {
-  background: none;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.chat-settings-menu {
-  position: absolute;
-  right: 10px;
-  top: 60px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  padding: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
+/* チャットメッセージエリアのスタイル設定 */
 .chat-messages {
-  flex: 1;
-  overflow-y: auto; /* スクロール可能にする */
-  padding: 15px;
-  box-sizing: border-box; /* パディングとボーダーを含めたサイズ設定 */
-  margin-top: 60px; /* ナビゲーションバーの高さを調整 */
-  margin-bottom: 100px; /* メッセージ入力欄の高さを考慮して下にマージンを追加 */
+  flex: 1; /* 残りのスペースを占める */
+  overflow-y: auto; /* 縦方向にスクロール可能 */
+  padding: 15px; /* 内側の余白 */
 }
 
-/* スクロールバーを非表示にする */
-.chat-messages::-webkit-scrollbar {
-  display: none; /* Webkit系ブラウザでのスクロールバーを非表示にする */
-}
-
+/* 個々のチャットメッセージのスタイル設定 */
 .chat-message {
   display: flex;
-  margin-bottom: 15px;
-  animation: fadeIn 0.3s ease-out;
+  margin-bottom: 15px; /* 下部の余白 */
+  animation: fadeIn 0.3s ease-out; /* フェードインアニメーション */
 }
 
+/* 自分のメッセージは右寄せに */
 .chat-message.own-message {
   justify-content: flex-end;
 }
 
+/* チャットアバターのスタイル設定 */
 .chat-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
+  border-radius: 50%; /* 丸くする */
+  margin-right: 10px; /* 右側の余白 */
 }
 
+/* メッセージコンテンツのスタイル設定 */
 .chat-message-content {
   background-color: #f1f0f0;
   border-radius: 18px;
   padding: 10px 15px;
-  max-width: 70%;
-  word-wrap: break-word;
-  color: #000; /* メッセージテキストの色を黒にする */
+  max-width: 70%; /* 最大幅 */
+  word-wrap: break-word; /* 長い単語を折り返す */
+  color: #000;
 }
 
+/* メッセージテキストのスタイル設定 */
 .chat-message-content p {
   margin: 0;
   color: #4a4a4a;
 }
 
+/* チャット入力エリアのスタイル設定 */
 .chat-input-container {
   display: flex;
-  padding: 10px;
-  border-top: 1px solid transparent;
-  background-color: transparent; /* 背景色を設定 */
-  box-sizing: border-box; /* パディングとボーダーを含めたサイズ設定 */
-  position: sticky; /* スクロールしないようにする */
-  bottom: 0; /* 画面下部に固定する */
-  width: 100%; /* 横幅を100%に設定 */
-  background-color: transparent; /* 背景色を白に設定 */
+  align-items: center; /* 垂直方向に中央揃え */
+  padding: 50px;
+  background-color: transparent;
 }
 
+/* テキストエリアのスタイル設定 */
 .chat-textarea {
-  flex-grow: 1;
-  border: 1px solid #e0e0e0;
+  flex-grow: 1; /* 残りのスペースを占める */
+  border: 1px solid transparent;
   border-radius: 20px;
   padding: 10px;
   font-size: 14px;
-  resize: none;
+  resize: none; /* サイズ変更を禁止 */
   outline: none;
+  height: 50px; /* 固定の高さ */
+  min-height: 40px; /* 最小高さ */
 }
 
+/* 送信ボタンのスタイル設定 */
 .chat-button {
   background-color: #0084ff;
   color: white;
   border: none;
   border-radius: 20px;
-  padding: 10px 20px; /* ボタンの内側のパディングを調整 */
+  padding: 10px 20px;
   margin-left: 10px;
   cursor: pointer;
   font-size: 14px;
-  height: 65px; /* ボタンの高さを設定 */
-  line-height: 20px; /* ボタン内のテキストの位置を調整 */
+  height: 50px; /* テキストエリアと同じ高さ */
+  line-height: 20px;
+  white-space: nowrap; /* テキストを1行に保つ */
+  margin-top: -18px; /* 送信ボタンを上に移動 */
 }
 
+/* 送信ボタンのホバー時のスタイル設定 */
 .chat-button:hover {
   background-color: #0073e6;
 }
 
+/* フェードインアニメーションの定義 */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* 背景画像のスタイル設定 */
+.background-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/back.png') !important;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  z-index: -1;
+}
+
+/* ナビゲーションリンクのスタイル設定 */
+.nav-link {
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 2px solid #666;
+  box-shadow: 2px 2px 0 #333;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ナビゲーションリンクのホバーエフェクトの定義 */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200%;
+  height: 200%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+
+/* ナビゲーションリンク内のテキストの位置調整 */
+.nav-link span {
+  position: relative;
+  z-index: 1;
+}
+
+/* ナビゲーションリンクのホバー時のスタイル設定 */
+.nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.6), 0 0 35px rgba(0, 255, 255, 0.4);
+}
+
+/* ナビゲーションリンクのホバーエフェクトのアニメーション */
+.nav-link:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ナビゲーションリンクのアクティブ時のスタイル設定 */
+.nav-link:active {
+  background-color: rgba(0, 0, 0, 0.9);
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+  transform: scale(0.98);
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+/* Minecraft風のフォント設定 */
+.minecraft-font {
+  font-family: 'Press Start 2P', cursive;
+}
+
+/* スライドダウンアニメーションの定義 */
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* スライドダウンアニメーションの適用 */
+.slide-down {
+  animation: slide-down 1s ease-out;
+}
+
+/* スクロールバーを非表示にする */
+.chat-messages::-webkit-scrollbar {
+  display: none; /* Webkit系ブラウザでのスクロールバーを非表示にする */
 }

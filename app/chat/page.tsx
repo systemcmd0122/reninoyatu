@@ -1,5 +1,3 @@
-// Chat.js
-
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -45,7 +43,10 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const chatMessages = document.querySelector('.chat-messages');
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
   }, []);
 
   useEffect(() => {
@@ -257,8 +258,8 @@ const Chat = () => {
   const renderChat = () => (
     <div className="relative min-h-screen flex flex-col">
       <div className="background-image"></div>
+      {renderNavbar()}
       <div className="main-content flex-grow flex flex-col">
-        {renderNavbar()}
         <div className="chat-container">
           <div className="chat-messages">
             {messages.map((msg) => (
