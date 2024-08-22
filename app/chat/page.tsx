@@ -18,6 +18,7 @@ import {
   InputRightElement,
   VStack,
   Text,
+  useToast,
 } from '@/common/design';
 
 const DEFAULT_AVATAR = 'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y';
@@ -41,23 +42,20 @@ const Chat = () => {
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const { handleSubmit, register, reset } = useForm();
   const router = useRouter();
+  const toast = useToast();
 
-  // 新しい状態変数
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [newAvatarUrl, setNewAvatarUrl] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-//メッセージ削除
-const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
-const [editingContent, setEditingContent] = useState('');
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState('');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = useCallback(() => {
-    const chatMessages = document.querySelector('.chat-messages');
-    if (chatMessages) {
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   const fetchMessages = async () => {
@@ -68,8 +66,20 @@ const [editingContent, setEditingContent] = useState('');
 
     if (error) {
       console.error('メッセージの取得中にエラーが発生しました:', error);
+      toast({
+        title: 'エラー',
+        description: 'メッセージの取得に失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
     } else {
       setMessages(data as ChatData[]);
+      scrollToBottom();
     }
   };
 
@@ -127,28 +137,78 @@ const [editingContent, setEditingContent] = useState('');
   const onSubmit = handleSubmit(async (data) => {
     const passwordError = validatePassword(data.password);
     if (passwordError) {
-      alert(passwordError);
+      toast({
+        title: 'エラー',
+        description: passwordError,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
       return;
     }
 
     if (isSignup) {
       if (!data.username) {
-        alert('ユーザー名を入力してください');
+        toast({
+          title: 'エラー',
+          description: 'ユーザー名を入力してください',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
         return;
       }
       if (!data.confirm) {
-        alert('確認用パスワードを入力してください');
+        toast({
+          title: 'エラー',
+          description: '確認用パスワードを入力してください',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
         return;
       }
 
       const confirmError = validatePassword(data.confirm);
       if (confirmError) {
-        alert(confirmError);
+        toast({
+          title: 'エラー',
+          description: confirmError,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
         return;
       }
 
       if (data.password !== data.confirm) {
-        alert('パスワードが一致しません');
+        toast({
+          title: 'エラー',
+          description: 'パスワードが一致しません',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
         return;
       }
 
@@ -157,9 +217,29 @@ const [editingContent, setEditingContent] = useState('');
         .insert([{ username: data.username, password: data.password, avatar_url: DEFAULT_AVATAR }]);
 
       if (error) {
-        alert('エラーが発生しました: ' + error.message);
+        toast({
+          title: 'エラー',
+          description: 'ユーザー登録に失敗しました: ' + error.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
       } else {
-        alert('ユーザー登録が成功しました！');
+        toast({
+          title: '成功',
+          description: 'ユーザー登録が成功しました！',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
         setUsername(data.username);
         setAvatarUrl(DEFAULT_AVATAR);
         reset();
@@ -173,16 +253,42 @@ const [editingContent, setEditingContent] = useState('');
         .single();
 
       if (userError || !userData) {
-        alert('ユーザー名が見つかりません');
+        toast({
+          title: 'エラー',
+          description: 'ユーザー名が見つかりません',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
         return;
       }
 
       if (userData.password !== data.password) {
-        alert('パスワードが違います');
+        toast({
+          title: 'エラー',
+          description: 'パスワードが違います',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+          containerStyle: {
+            zIndex: 1500,
+          },
+        });
         return;
       }
 
-      alert('ログイン成功！');
+      toast({
+        title: '成功',
+        description: 'ログイン成功！',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
       setUsername(userData.username);
       setAvatarUrl(userData.avatar_url || DEFAULT_AVATAR);
       reset();
@@ -229,22 +335,68 @@ const [editingContent, setEditingContent] = useState('');
 
     if (error) {
       console.error('メッセージの送信中にエラーが発生しました:', error);
+      toast({
+        title: 'エラー',
+        description: 'メッセージの送信に失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      setNewMessage('');
+      broadcastTyping(false);
+      scrollToBottom();
     }
-
-    setNewMessage('');
-    broadcastTyping(false);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       handleSendMessage();
     }
   };
 
-  // 新しい関数: アバターURL更新
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const uploadAvatar = async () => {
+    if (!selectedFile) return;
+
+    const fileExt = selectedFile.name.split('.').pop();
+    const fileName = `${username}_${Date.now()}.${fileExt}`;
+    const filePath = `avatars/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, selectedFile);
+
+    if (uploadError) {
+      console.error('画像のアップロード中にエラーが発生しました:', uploadError);
+      toast({
+        title: 'エラー',
+        description: '画像のアップロードに失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
+      return;
+    }
+
+    const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+
+    if (data) {
+      await updateAvatarUrl(data.publicUrl);
+    }
+  };
+
   const updateAvatarUrl = async (newUrl: string) => {
-    // ユーザーのアバターURLを更新
     const { error } = await supabase
       .from('users')
       .update({ avatar_url: newUrl })
@@ -252,10 +404,20 @@ const [editingContent, setEditingContent] = useState('');
 
     if (error) {
       console.error('アバターURLの更新中にエラーが発生しました:', error);
+      toast({
+        title: 'エラー',
+        description: 'アバターURLの更新に失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
       return;
     }
 
-    // 全てのメッセージのアバターURLを更新
     const { error: messageError } = await supabase
       .from('chat_data')
       .update({ avatar_url: newUrl })
@@ -263,13 +425,38 @@ const [editingContent, setEditingContent] = useState('');
 
     if (messageError) {
       console.error('メッセージのアバターURL更新中にエラーが発生しました:', messageError);
+      toast({
+        title: 'エラー',
+        description: 'メッセージのアバターURL更新に失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
       return;
     }
 
     setAvatarUrl(newUrl);
     setIsSettingsOpen(false);
-    setNewAvatarUrl('');
-    fetchMessages(); // メッセージを再取得して UI を更新
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    fetchMessages();
+    toast({
+      title: '成功',
+      description: 'アバター画像が更新されました',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+      position: 'top',
+      containerStyle: {
+        zIndex: 1500,
+      },
+    });
   };
 
   const renderNavbar = () => (
@@ -293,7 +480,6 @@ const [editingContent, setEditingContent] = useState('');
       </div>
     </nav>
   );
-
 
   const renderAuth = () => (
     <div className="relative min-h-screen flex flex-col">
@@ -376,123 +562,229 @@ const [editingContent, setEditingContent] = useState('');
     </div>
   );
 
-  // 新しい関数: 設定モーダルのレンダリング
   const renderSettingsModal = () => (
     <div className="settings-modal">
-      <div className="settings-content">
-        <h2>アバターURLの変更</h2>
-        <input
-          type="text"
-          value={newAvatarUrl}
-          onChange={(e) => setNewAvatarUrl(e.target.value)}
-          placeholder="新しいアバターURLを入力"
-        />
-        <button onClick={() => updateAvatarUrl(newAvatarUrl)}>更新</button>
-        <button onClick={() => setIsSettingsOpen(false)}>キャンセル</button>
+      <div className="settings-content bg-discord-dark text-discord-text">
+        <h2 className="text-xl font-bold mb-4">アバター画像の変更</h2>
+        <div className="mb-4">
+          <label htmlFor="avatar-upload" className="block mb-2">画像を選択</label>
+          <input
+            id="avatar-upload"
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*"
+            ref={fileInputRef}
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-discord-blue text-white px-4 py-2 rounded-lg hover:bg-discord-blue-hover w-full"
+          >
+            画像を選択
+          </button>
+        </div>
+        {selectedFile && (
+          <div className="mb-4">
+            <img
+              src={URL.createObjectURL(selectedFile)}
+              alt="Selected avatar"
+              className="w-24 h-24 object-cover rounded-full mx-auto"
+            />
+          </div>
+        )}
+        <div className="flex justify-between">
+          <button
+            onClick={uploadAvatar}
+            disabled={!selectedFile}
+            className={`bg-discord-green text-white px-4 py-2 rounded-lg ${
+              selectedFile ? 'hover:bg-discord-green-hover' : 'opacity-50 cursor-not-allowed'
+            }`}
+          >
+            アップロード
+          </button>
+          <button
+            onClick={() => setIsSettingsOpen(false)}
+            className="bg-discord-red text-white px-4 py-2 rounded-lg hover:bg-discord-red-hover"
+          >
+            キャンセル
+          </button>
+        </div>
       </div>
     </div>
   );
 
-  //メッセージ変更
   const deleteMessage = async (messageId: string) => {
-  const { error } = await supabase
-    .from('chat_data')
-    .delete()
-    .match({ id: messageId });
+    const { error } = await supabase
+      .from('chat_data')
+      .delete()
+      .match({ id: messageId });
 
-  if (error) {
-    console.error('メッセージの削除中にエラーが発生しました:', error);
-  } else {
-    fetchMessages();
-  }
-};
+    if (error) {
+      console.error('メッセージの削除中にエラーが発生しました:', error);
+      toast({
+        title: 'エラー',
+        description: 'メッセージの削除に失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
+    } else {
+      fetchMessages();
+      toast({
+        title: '成功',
+        description: 'メッセージが削除されました',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
+    }
+  };
 
-const startEditingMessage = (messageId: string, content: string) => {
-  setEditingMessageId(messageId);
-  setEditingContent(content);
-};
+  const startEditingMessage = (messageId: string, content: string) => {
+    setEditingMessageId(messageId);
+    setEditingContent(content);
+  };
 
-const cancelEditingMessage = () => {
-  setEditingMessageId(null);
-  setEditingContent('');
-};
+  const cancelEditingMessage = () => {
+    setEditingMessageId(null);
+    setEditingContent('');
+  };
 
-const saveEditedMessage = async (messageId: string) => {
-  const { error } = await supabase
-    .from('chat_data')
-    .update({ content: editingContent })
-    .match({ id: messageId });
+  const saveEditedMessage = async (messageId: string) => {
+    const { error } = await supabase
+      .from('chat_data')
+      .update({ content: editingContent })
+      .match({ id: messageId });
 
-  if (error) {
-    console.error('メッセージの編集中にエラーが発生しました:', error);
-  } else {
-    fetchMessages();
-    cancelEditingMessage();
-  }
-};
+    if (error) {
+      console.error('メッセージの編集中にエラーが発生しました:', error);
+      toast({
+        title: 'エラー',
+        description: 'メッセージの編集に失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
+    } else {
+      fetchMessages();
+      cancelEditingMessage();
+      toast({
+        title: '成功',
+        description: 'メッセージが編集されました',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
+    }
+  };
 
   const renderChat = () => (
     <div className="relative min-h-screen flex flex-col">
       <div className="background-image"></div>
-      {renderNavbar()}
       <div className="main-content flex-grow flex flex-col">
-        <div className="chat-container">
-        <div className="chat-messages">
-          {messages.map((msg) => (
-            <div key={msg.id} className={`chat-message ${msg.username === username ? 'own-message' : ''}`}>
-              <img src={msg.avatar_url || DEFAULT_AVATAR} alt="Avatar" className="chat-avatar" />
-              <div className="chat-message-content">
-                <span className="chat-message-username">{msg.username}</span>
-                {editingMessageId === msg.id ? (
-                  <div>
-                    <textarea
-                      value={editingContent}
-                      onChange={(e) => setEditingContent(e.target.value)}
-                      className="edit-message-textarea"
-                    />
-                    <button onClick={() => saveEditedMessage(msg.id)}>保存|</button>
-                    <button onClick={cancelEditingMessage}>   キャンセル</button>
+        {renderNavbar()}
+        <div className="flex-grow flex overflow-hidden">
+          <div className="flex-grow flex flex-col bg-discord-dark">
+            <div className="flex-grow p-4 overflow-y-auto scrollbar-thin scrollbar-thumb-discord-scrollbar">
+              {messages.map((message) => (
+                <div key={message.id} className="flex items-start space-x-3 mb-3 hover:bg-discord-hover p-2 rounded">
+                  <img
+                    src={message.avatar_url || DEFAULT_AVATAR}
+                    alt="Avatar"
+                    className="h-10 w-10 rounded-full"
+                  />
+                  <div className="flex-grow">
+                    <div className="flex items-center">
+                      <div className="text-discord-text font-medium mr-2">
+                        {message.username}
+                      </div>
+                      <div className="text-xs text-discord-timestamp">
+                        {new Date(message.created_at).toLocaleTimeString()}
+                      </div>
+                    </div>
+                    {editingMessageId === message.id ? (
+                      <div className="flex items-center space-x-2 mt-1">
+                        <textarea
+                          value={editingContent}
+                          onChange={(e) => setEditingContent(e.target.value)}
+                          className="flex-grow p-2 bg-discord-input text-discord-text rounded resize-none"
+                          rows={2}
+                        />
+                        <button
+                          onClick={() => saveEditedMessage(message.id)}
+                          className="bg-discord-blue text-white px-3 py-1 rounded hover:bg-discord-blue-hover"
+                        >
+                          保存
+                        </button>
+                        <button
+                          onClick={cancelEditingMessage}
+                          className="bg-discord-red text-white px-3 py-1 rounded hover:bg-discord-red-hover"
+                        >
+                          キャンセル
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-discord-text">{message.content}</div>
+                    )}
+                    {username === message.username && (
+                      <div className="text-xs space-x-2 mt-1">
+                        <button
+                          onClick={() => startEditingMessage(message.id, message.content)}
+                          className="text-discord-blue hover:underline"
+                        >
+                          編集
+                        </button>
+                        <button
+                          onClick={() => deleteMessage(message.id)}
+                          className="text-discord-red hover:underline"
+                        >
+                          削除
+                        </button>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div>{msg.content}</div>
-                )}
-                {msg.username === username && (
-                  <div className="message-actions">
-                    <button onClick={() => startEditingMessage(msg.id, msg.content)}>編集</button>
-                    <button onClick={() => deleteMessage(msg.id)}>削除</button>
-                  </div>
-                )}
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+            <div className="p-4 bg-discord-dark">
+            <div className="chat-input-container">
+              <textarea
+                className="chat-textarea"
+                rows={1}
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onInput={handleTyping}
+                placeholder="メッセージを入力..."
+              />
+              <button
+                onClick={handleSendMessage}
+                className="chat-button"
+              >
+                送信
+              </button>
               </div>
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-          <div className="typing-indicator">
-            {typingUsers.filter(user => user !== username).length > 0 && (
-              <Text fontSize="sm" color="white">
-                {typingUsers.filter(user => user !== username).join(', ')}
-                {typingUsers.filter(user => user !== username).length > 1 ? ' が入力中...' : ' が入力中...'}
-              </Text>
-            )}
-          </div>
-          <div className="chat-input-container">
-            <textarea
-              className="chat-textarea"
-              placeholder="メッセージを入力..."
-              value={newMessage}
-              onChange={(e) => {
-                setNewMessage(e.target.value);
-                handleTyping();
-              }}
-              onKeyDown={handleKeyDown}
-            />
-            <button className="chat-button" onClick={handleSendMessage}>
-              送信
-            </button>
           </div>
         </div>
       </div>
-      {/* 設定モーダルを表示 */}
       {isSettingsOpen && renderSettingsModal()}
     </div>
   );
