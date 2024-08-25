@@ -471,8 +471,9 @@ const Chat = () => {
         <Link href="/contact" className="nav-link"><span>Contact</span></Link>
         <Link href="/enjoy" className="nav-link"><span>Enjoy</span></Link>
         {username ? (
-          <button className="nav-link settings-button" onClick={() => setIsSettingsOpen(true)}>
-            <span>設定</span>
+          <button className="nav-link settings-button" onClick={() =>
+            setIsSettingsOpen(true)}>
+            <span>settings</span>
           </button>
         ) : (
           <Link href="/chat" className="nav-link"><span>Chat</span></Link>
@@ -740,7 +741,7 @@ const Chat = () => {
                         </button>
                       </div>
                     ) : (
-                      <div className="text-discord-text">{message.content}</div>
+                      <div className="text-discord-text whitespace-pre-wrap">{message.content}</div>
                     )}
                     {username === message.username && (
                       <div className="text-xs space-x-2 mt-1">
@@ -764,22 +765,23 @@ const Chat = () => {
               <div ref={messagesEndRef} />
             </div>
             <div className="p-4 bg-discord-dark">
-            <div className="chat-input-container">
-              <textarea
-                className="chat-textarea"
-                rows={1}
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onInput={handleTyping}
-                placeholder="メッセージを入力..."
-              />
-              <button
-                onClick={handleSendMessage}
-                className="chat-button"
-              >
-                送信
-              </button>
+              <div className="chat-input-container">
+                <textarea
+                  className="chat-textarea"
+                  rows={1}
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  onInput={handleTyping}
+                  placeholder="メッセージを入力..."
+                  style={{ whiteSpace: 'pre-wrap' }}
+                />
+                <button
+                  onClick={handleSendMessage}
+                  className="chat-button"
+                >
+                  送信
+                </button>
               </div>
             </div>
           </div>

@@ -104,7 +104,6 @@ body, html {
   transition: background-color 0.2s;
 }
 
-
 /* 送信ボタンのホバー時のスタイル設定 */
 .chat-button:hover {
   background-color: #0073e6;
