@@ -15,10 +15,8 @@ const About = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      {/* 背景画像 */}
       <div className="background-image"></div>
       
-      {/* メインコンテンツ */}
       <div className="main-content flex flex-col items-center justify-center">
         <nav className="navbar w-full p-4 text-white flex justify-between items-center slide-down">
           <div className="flex items-center space-x-2">
@@ -26,7 +24,7 @@ const About = () => {
             <div className="text-lg font-bold minecraft-font">例のやつ：About</div>
           </div>
           <div className="flex space-x-4 minecraft-font">
-          <Link href="/" className="nav-link"><span>Home</span></Link>
+            <Link href="/" className="nav-link"><span>Home</span></Link>
             <Link href="/about" className="nav-link"><span>About</span></Link>
             <Link href="/contact" className="nav-link"><span>Contact</span></Link>
             <Link href="/enjoy" className="nav-link"><span>Enjoy</span></Link>
@@ -34,10 +32,9 @@ const About = () => {
           </div>
         </nav>
 
-        {/* 自己紹介 */}
         <main className="flex-grow flex flex-col items-center justify-center w-full p-8 space-y-12">
           <motion.div
-            className="intro-container bg-white bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl"
+            className="bg-white bg-opacity-90 rounded-lg shadow-lg p-10 w-full max-w-6xl"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -68,7 +65,6 @@ const About = () => {
             </div>
           </motion.div>
 
-          {/* ソーシャルリンク */}
           <motion.div
             className="w-full max-w-6xl"
             initial={{ opacity: 0, y: 50 }}
@@ -76,7 +72,7 @@ const About = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <h2 className="text-3xl font-bold mb-6 text-center text-white minecraft-font">SNSリンク</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {socialLinks.map((link, index) => (
                 <motion.a
                   key={link.name}
@@ -97,7 +93,6 @@ const About = () => {
             </div>
           </motion.div>
 
-          {/* 座右の銘 */}
           <motion.div
             className="w-full max-w-6xl mt-12"
             initial={{ opacity: 0, y: 50 }}
@@ -110,10 +105,11 @@ const About = () => {
               <p className="text-2xl font-bold text-white text-center mt-4 minecraft-font">「みかんはこの世の心理である」</p>
             </div>
           </motion.div>
-          <footer className="footer bg-gray-800 text-white p-4 text-center w-full">
+        </main>
+
+        <footer className="w-full bg-gray-800 text-white p-4 text-center">
           <p>© 2024 例のやつ. All rights reserved.</p>
         </footer>
-        </main>
       </div>
     </div>
   );

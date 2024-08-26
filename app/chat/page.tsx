@@ -288,7 +288,10 @@ const Chat = () => {
         status: 'success',
         duration: 3000,
         isClosable: true,
-      });
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        }});
       setUsername(userData.username);
       setAvatarUrl(userData.avatar_url || DEFAULT_AVATAR);
       reset();
@@ -312,9 +315,7 @@ const Chat = () => {
       clearTimeout(typingTimeoutRef.current);
     }
     typingTimeoutRef.current = setTimeout(() => {
-      if (typingUsers.includes(username)) {
-        broadcastTyping(false);
-      }
+      broadcastTyping(false);
     }, 3000);
   };
 
@@ -362,17 +363,46 @@ const Chat = () => {
     }
   };
 
+  const deleteOldAvatar = async (oldAvatarUrl: string) => {
+    if (!oldAvatarUrl || oldAvatarUrl === DEFAULT_AVATAR) return;
+  
+    const oldFileName = oldAvatarUrl.split('/').pop();
+    if (!oldFileName) return;
+  
+    const { error } = await supabase.storage
+      .from('avatars')
+      .remove([`avatars/${oldFileName}`]);
+  
+    if (error) {
+      console.error('古いアバターの削除中にエラーが発生しました:', error);
+      toast({
+        title: 'エラー',
+        description: '古いアバターの削除に失敗しました',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+        containerStyle: {
+          zIndex: 1500,
+        },
+      });
+    }
+  };
+
   const uploadAvatar = async () => {
     if (!selectedFile) return;
-
+  
+    // 古いアバターを削除
+    await deleteOldAvatar(avatarUrl);
+  
     const fileExt = selectedFile.name.split('.').pop();
     const fileName = `${username}_${Date.now()}.${fileExt}`;
     const filePath = `avatars/${fileName}`;
-
+  
     const { error: uploadError } = await supabase.storage
       .from('avatars')
       .upload(filePath, selectedFile);
-
+  
     if (uploadError) {
       console.error('画像のアップロード中にエラーが発生しました:', uploadError);
       toast({
@@ -388,20 +418,22 @@ const Chat = () => {
       });
       return;
     }
-
+  
     const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-
+  
     if (data) {
       await updateAvatarUrl(data.publicUrl);
     }
   };
 
   const updateAvatarUrl = async (newUrl: string) => {
+    const oldUrl = avatarUrl;
+  
     const { error } = await supabase
       .from('users')
       .update({ avatar_url: newUrl })
       .eq('username', username);
-
+  
     if (error) {
       console.error('アバターURLの更新中にエラーが発生しました:', error);
       toast({
@@ -417,12 +449,12 @@ const Chat = () => {
       });
       return;
     }
-
+  
     const { error: messageError } = await supabase
       .from('chat_data')
       .update({ avatar_url: newUrl })
       .eq('username', username);
-
+  
     if (messageError) {
       console.error('メッセージのアバターURL更新中にエラーが発生しました:', messageError);
       toast({
@@ -438,7 +470,7 @@ const Chat = () => {
       });
       return;
     }
-
+  
     setAvatarUrl(newUrl);
     setIsSettingsOpen(false);
     setSelectedFile(null);
@@ -457,6 +489,11 @@ const Chat = () => {
         zIndex: 1500,
       },
     });
+  
+    // 古いアバターを削除（デフォルトアバター以外の場合）
+    if (oldUrl !== DEFAULT_AVATAR) {
+      await deleteOldAvatar(oldUrl);
+    }
   };
 
   const renderNavbar = () => (
@@ -486,7 +523,7 @@ const Chat = () => {
     <div className="relative min-h-screen flex flex-col">
       <div className="background-image"></div>
       <div className="main-content flex-grow flex flex-col">
-        {renderNavbar()}
+      {renderNavbar()}
         <Flex
           flexDirection='column'
           width='100%'
@@ -764,6 +801,11 @@ const Chat = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
+            {typingUsers.length > 0 && (
+              <div className="typing-indicator">
+                {typingUsers.filter(user => user !== username).join(', ')}が入力中...
+              </div>
+            )}
             <div className="p-4 bg-discord-dark">
               <div className="chat-input-container">
                 <textarea

@@ -391,3 +391,31 @@ body, html {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.image-upload-button {
+  background-color: var(--discord-green);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.selected-image-preview {
+  margin-top: 10px;
+}
+
+.selected-image-preview img {
+  max-width: 200px;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+.message-image {
+  max-width: 300px;
+  max-height: 300px;
+  object-fit: contain;
+  margin-top: 10px;
+}
