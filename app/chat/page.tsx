@@ -128,6 +128,65 @@ const Chat = () => {
     };
   }, []);
 
+  const updateUserStatus = useCallback(async (username: string, status: boolean) => {
+    if (!username.trim()) {
+      const { error: deleteError } = await supabase
+        .from('user_status')
+        .delete()
+        .is('username', null);
+      
+      if (deleteError) {
+        console.error('空のユーザー名のステータス削除中にエラーが発生しました:', deleteError);
+      }
+      return;
+    }
+
+    const { error: deleteError } = await supabase
+      .from('user_status')
+      .delete()
+      .eq('username', username);
+  
+    if (deleteError) {
+      console.error('古いステータスの削除中にエラーが発生しました:', deleteError);
+    }
+  
+    const { error: insertError } = await supabase
+      .from('user_status')
+      .insert([{ username, is_online: status, updated_at: new Date().toISOString() }]);
+    
+    if (insertError) {
+      console.error('新しいステータスの挿入中にエラーが発生しました:', insertError);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (username) {
+      updateUserStatus(username, true);
+
+      // ページを閉じる際のイベントリスナーを追加
+      const handleBeforeUnload = () => {
+        updateUserStatus(username, false);
+      };
+
+      window.addEventListener('beforeunload', handleBeforeUnload);
+
+      // コンポーネントのクリーンアップ時にイベントリスナーを削除
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        updateUserStatus(username, false);
+      };
+    }
+  }, [username, updateUserStatus]);
+
+  const getUserStatus = async (username: string) => {
+    const { data } = await supabase
+      .from('user_status')
+      .select('is_online')
+      .eq('username', username)
+      .single();
+    return data?.is_online ? 'オンライン' : 'オフライン';
+  };
+
   const validatePassword = (password: string) => {
     if (!password) return 'パスワードを入力してください';
     if (/[ぁ-ん]/.test(password)) return 'パスワードにひらがなを使用しないでください';
@@ -510,7 +569,7 @@ const Chat = () => {
         {username ? (
           <button className="nav-link settings-button" onClick={() =>
             setIsSettingsOpen(true)}>
-            <span>settings</span>
+            <span>Settings</span>
           </button>
         ) : (
           <Link href="/chat" className="nav-link"><span>Chat</span></Link>
@@ -745,7 +804,24 @@ const Chat = () => {
                   <img
                     src={message.avatar_url || DEFAULT_AVATAR}
                     alt="Avatar"
-                    className="h-10 w-10 rounded-full"
+                    className="h-10 w-10 rounded-full cursor-pointer"
+                    onMouseEnter={async (e) => {
+                      const status = await getUserStatus(message.username);
+                      const tooltip = document.createElement('div');
+                      tooltip.innerText = `${message.username}: ${status}`;
+                      tooltip.className = 'status-tooltip';
+                      tooltip.style.position = 'absolute';
+                      tooltip.style.top = `${e.clientY + 10}px`;
+                      tooltip.style.left = `${e.clientX + 10}px`;
+                      document.body.appendChild(tooltip);
+                      
+                      const handleMouseLeave = () => {
+                        tooltip.remove();
+                        e.target.removeEventListener('mouseleave', handleMouseLeave);
+                      };
+                      
+                      e.target.addEventListener('mouseleave', handleMouseLeave);
+                    }}
                   />
                   <div className="flex-grow">
                     <div className="flex items-center">

@@ -419,3 +419,13 @@ body, html {
   object-fit: contain;
   margin-top: 10px;
 }
+
+.status-tooltip {
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
+  z-index: 1000;
+  pointer-events: none; /* ツールチップ自体にはマウスイベントが発生しないようにする */
+}
